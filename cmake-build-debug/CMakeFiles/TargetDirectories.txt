@@ -1,0 +1,3 @@
+/tmp/tmp.xWsCm58ghd/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/tmp/tmp.xWsCm58ghd/cmake-build-debug/CMakeFiles/edit_cache.dir
+/tmp/tmp.xWsCm58ghd/cmake-build-debug/CMakeFiles/MyDB.dir
