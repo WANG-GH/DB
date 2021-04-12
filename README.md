@@ -1,2 +1,2 @@
 # DB
-大创的DataBase
+Try to understand leveldb's diffrent parts seperatly

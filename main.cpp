@@ -1,46 +1,20 @@
-#include <stdio.h>
-#include<iostream>
-#include<fstream>
-#include<vector>
-#include<cstring>
-#include <cassert>
-
-#include "db/mydb.h"
-
-using namespace std;
-
-void TestMyDB() {
-    cout << "/*²âÊÔPutºÍGet*/" << endl;
-    MyDB *db;
-    MyDB::Open("Database", &db);
-    string key = "key";
-    string val = "val----------------------------------------------------";
-    for (int i = 0; i < 200000; ++i) {
-        key = "key";
-        db->Put(key + to_string(i), val + to_string(i));
-    }
-    for (int i = 0; i < 200000; ++i) {
-        string value = "";
-        db->Get(key + to_string(i), &value);
-        cout << value << endl;
-    }
-    delete db;
-
-
-    cout << "/*²âÊÔCallBackIndex*/" << endl;
-    MyDB::Open("Database", &db);
-    for (int i = 0; i < 200000; ++i) {
-        string value = "";
-        db->Get(key + to_string(i), &value);
-        cout << value << endl;
-    }
-    delete db;
-
-}
+#include <iostream>
+#include "skiplist.h"
+#include "memtable.h"
 
 int main() {
-    TestMyDB();
-    return 0;
-
+    const InternalKeyComparator internal_comparator_;
+    MemTable * memtable = new MemTable(internal_comparator_);
+    Slice key0("key0"),key1("key1"),value0("value0"),value1("value1"),key2("key2"),value2("value2");
+    memtable->Add(0,kTypeValue,key0,value0);
+    memtable->Add(1,kTypeValue,key1,value1);
+    memtable->Add(2,kTypeValue,key2,value2);
+    std::string value;
+    Status s ;
+    memtable->Get("key0",&value,&s);
+    std::cout << value <<std::endl;
+    memtable->Get("key2",&value,&s);
+    std::cout << value <<std::endl;
+    memtable->Get("key1",&value,&s);
+    std::cout << value <<std::endl;
 }
-
