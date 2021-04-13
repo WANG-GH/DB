@@ -1,9 +1,13 @@
 file(REMOVE_RECURSE
   "CMakeFiles/kvengine.dir/main.cpp.o"
+  "CMakeFiles/kvengine.dir/src/YeapDB.cpp.o"
   "CMakeFiles/kvengine.dir/src/arena.cpp.o"
+  "CMakeFiles/kvengine.dir/src/env.cpp.o"
   "CMakeFiles/kvengine.dir/src/memtable.cpp.o"
-  "kvengine.pdb"
+  "CMakeFiles/kvengine.dir/src/status.cpp.o"
+  "CMakeFiles/kvengine.dir/src/version_set.cpp.o"
   "kvengine"
+  "kvengine.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

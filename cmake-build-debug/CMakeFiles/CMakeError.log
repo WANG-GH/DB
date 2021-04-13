@@ -1,51 +1,60 @@
-Determining if the pthread_create exist failed with the following output:
-Change Dir: /mnt/d/home/workspace/kvengine/cmake-build-debug/CMakeFiles/CMakeTmp
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD failed with the following output:
+Change Dir: /home/yeye/桌面/DB/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_00ba4/fast"
-/usr/bin/make -f CMakeFiles/cmTC_00ba4.dir/build.make CMakeFiles/cmTC_00ba4.dir/build
-make[1]: Entering directory '/mnt/d/home/workspace/kvengine/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_00ba4.dir/CheckSymbolExists.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_00ba4.dir/CheckSymbolExists.c.o   -c /mnt/d/home/workspace/kvengine/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.c
-Linking C executable cmTC_00ba4
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_00ba4.dir/link.txt --verbose=1
-/usr/bin/cc      -rdynamic CMakeFiles/cmTC_00ba4.dir/CheckSymbolExists.c.o  -o cmTC_00ba4 
-/usr/bin/ld: CMakeFiles/cmTC_00ba4.dir/CheckSymbolExists.c.o: in function `main':
-CheckSymbolExists.c:(.text+0x1b): undefined reference to `pthread_create'
+Run Build Command(s):/usr/bin/make cmTC_d00ba/fast && /usr/bin/make  -f CMakeFiles/cmTC_d00ba.dir/build.make CMakeFiles/cmTC_d00ba.dir/build
+make[1]: 进入目录“/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles/CMakeTmp”
+Building C object CMakeFiles/cmTC_d00ba.dir/src.c.o
+/usr/bin/cc   -DCMAKE_HAVE_LIBC_PTHREAD   -o CMakeFiles/cmTC_d00ba.dir/src.c.o   -c /home/yeye/桌面/DB/cmake-build-debug/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_d00ba
+/home/yeye/下载/clion-2020.3.1/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d00ba.dir/link.txt --verbose=1
+/usr/bin/cc  -DCMAKE_HAVE_LIBC_PTHREAD    -rdynamic CMakeFiles/cmTC_d00ba.dir/src.c.o  -o cmTC_d00ba 
+/usr/bin/ld: CMakeFiles/cmTC_d00ba.dir/src.c.o: in function `main':
+src.c:(.text+0x46): undefined reference to `pthread_create'
+/usr/bin/ld: src.c:(.text+0x52): undefined reference to `pthread_detach'
+/usr/bin/ld: src.c:(.text+0x5e): undefined reference to `pthread_cancel'
+/usr/bin/ld: src.c:(.text+0x6f): undefined reference to `pthread_join'
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_00ba4.dir/build.make:87: cmTC_00ba4] Error 1
-make[1]: Leaving directory '/mnt/d/home/workspace/kvengine/cmake-build-debug/CMakeFiles/CMakeTmp'
-make: *** [Makefile:121: cmTC_00ba4/fast] Error 2
+make[1]: *** [CMakeFiles/cmTC_d00ba.dir/build.make:107：cmTC_d00ba] 错误 1
+make[1]: 离开目录“/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles/CMakeTmp”
+make: *** [Makefile:141：cmTC_d00ba/fast] 错误 2
 
-File /mnt/d/home/workspace/kvengine/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
-/* */
+
+Source file was:
 #include <pthread.h>
 
-int main(int argc, char** argv)
+void* test_func(void* data)
 {
-  (void)argv;
-#ifndef pthread_create
-  return ((int*)(&pthread_create))[argc];
-#else
-  (void)argc;
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
   return 0;
-#endif
 }
 
 Determining if the function pthread_create exists in the pthreads failed with the following output:
-Change Dir: /mnt/d/home/workspace/kvengine/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/yeye/桌面/DB/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_29e02/fast"
-/usr/bin/make -f CMakeFiles/cmTC_29e02.dir/build.make CMakeFiles/cmTC_29e02.dir/build
-make[1]: Entering directory '/mnt/d/home/workspace/kvengine/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_29e02.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_29e02.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.13/Modules/CheckFunctionExists.c
-Linking C executable cmTC_29e02
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_29e02.dir/link.txt --verbose=1
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_29e02.dir/CheckFunctionExists.c.o  -o cmTC_29e02 -lpthreads 
-/usr/bin/ld: cannot find -lpthreads
+Run Build Command(s):/usr/bin/make cmTC_e9023/fast && /usr/bin/make  -f CMakeFiles/cmTC_e9023.dir/build.make CMakeFiles/cmTC_e9023.dir/build
+make[1]: 进入目录“/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles/CMakeTmp”
+Building C object CMakeFiles/cmTC_e9023.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_e9023.dir/CheckFunctionExists.c.o   -c /home/yeye/下载/clion-2020.3.1/bin/cmake/linux/share/cmake-3.17/Modules/CheckFunctionExists.c
+Linking C executable cmTC_e9023
+/home/yeye/下载/clion-2020.3.1/bin/cmake/linux/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e9023.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_e9023.dir/CheckFunctionExists.c.o  -o cmTC_e9023  -lpthreads 
+/usr/bin/ld: 找不到 -lpthreads
 collect2: error: ld returned 1 exit status
-make[1]: *** [CMakeFiles/cmTC_29e02.dir/build.make:87: cmTC_29e02] Error 1
-make[1]: Leaving directory '/mnt/d/home/workspace/kvengine/cmake-build-debug/CMakeFiles/CMakeTmp'
-make: *** [Makefile:121: cmTC_29e02/fast] Error 2
+make[1]: *** [CMakeFiles/cmTC_e9023.dir/build.make:107：cmTC_e9023] 错误 1
+make[1]: 离开目录“/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles/CMakeTmp”
+make: *** [Makefile:141：cmTC_e9023/fast] 错误 2
+
 
 

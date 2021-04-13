@@ -1,6 +1,6 @@
 # CMake generated Testfile for 
-# Source directory: /mnt/d/home/workspace/kvengine/tests/googletest/googlemock
-# Build directory: /mnt/d/home/workspace/kvengine/cmake-build-debug/tests/googletest/googlemock
+# Source directory: /home/yeye/桌面/DB/tests/googletest/googlemock
+# Build directory: /home/yeye/桌面/DB/cmake-build-debug/tests/googletest/googlemock
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.

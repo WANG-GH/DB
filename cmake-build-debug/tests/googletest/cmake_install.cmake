@@ -1,4 +1,4 @@
-# Install script for directory: /mnt/d/home/workspace/kvengine/tests/googletest
+# Install script for directory: /home/yeye/桌面/DB/tests/googletest
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/mnt/d/home/workspace/kvengine/cmake-build-debug/tests/googletest/googlemock/cmake_install.cmake")
+  include("/home/yeye/桌面/DB/cmake-build-debug/tests/googletest/googlemock/cmake_install.cmake")
 
 endif()
 

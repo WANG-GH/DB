@@ -8,8 +8,8 @@
 #include "slice.h"
 #include "comparator.h"
 #include "status.h"
-enum ValueType { kTypeDeletion = 0x0, kTypeValue = 0x1 };
-typedef uint64_t SequenceNumber;
+#include "dbformat.h"
+
 // A helper class useful for DBImpl::Get()
 #if 0
 class LookupKey {
@@ -48,41 +48,7 @@ private:
     }
 };
 #endif
-class InternalKey{
 
-public:
-    InternalKey(){}
-    InternalKey(SequenceNumber seq_,ValueType type_,
-                const Slice key_,const Slice value_):
-            seq(seq_),type(type_),user_key(key_),user_value(value_){}
-    SequenceNumber seq;
-    ValueType type;
-    const Slice user_key;
-    const Slice user_value;
-};
-
-class InternalKeyComparator : public Comparator {
- public:
-    const char* Name() const override{
-        return NULL;
-    }
-    int Compare(const Slice& a, const Slice& b) const override{
-        return 0;
-    }
-    void FindShortestSeparator(std::string* start,
-                               const Slice& limit) const override{
-    }
-    void FindShortSuccessor(std::string* key) const override{
-    }
-    //以上方法是因为从虚基类 Comparator 继承需要实现
-    int Compare(const InternalKey& a, const InternalKey& b) const{
-        int r =a.user_key.compare(b.user_key);
-        if (r!=0){
-            return r;
-        }
-        return a.seq > b.seq ? -1:1;
-    }
-};
 class MemTable {
 public:
     MemTable(const InternalKeyComparator& comparator)
