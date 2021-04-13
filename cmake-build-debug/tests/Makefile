@@ -225,6 +225,33 @@ __/src/memtable.cpp.s:
 	cd /mnt/d/home/workspace/kvengine/cmake-build-debug && $(MAKE) -f tests/CMakeFiles/run_actual_tests.dir/build.make tests/CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.s
 .PHONY : __/src/memtable.cpp.s
 
+block_test.o: block_test.cpp.o
+
+.PHONY : block_test.o
+
+# target to build an object file
+block_test.cpp.o:
+	cd /mnt/d/home/workspace/kvengine/cmake-build-debug && $(MAKE) -f tests/CMakeFiles/run_actual_tests.dir/build.make tests/CMakeFiles/run_actual_tests.dir/block_test.cpp.o
+.PHONY : block_test.cpp.o
+
+block_test.i: block_test.cpp.i
+
+.PHONY : block_test.i
+
+# target to preprocess a source file
+block_test.cpp.i:
+	cd /mnt/d/home/workspace/kvengine/cmake-build-debug && $(MAKE) -f tests/CMakeFiles/run_actual_tests.dir/build.make tests/CMakeFiles/run_actual_tests.dir/block_test.cpp.i
+.PHONY : block_test.cpp.i
+
+block_test.s: block_test.cpp.s
+
+.PHONY : block_test.s
+
+# target to generate assembly for a file
+block_test.cpp.s:
+	cd /mnt/d/home/workspace/kvengine/cmake-build-debug && $(MAKE) -f tests/CMakeFiles/run_actual_tests.dir/build.make tests/CMakeFiles/run_actual_tests.dir/block_test.cpp.s
+.PHONY : block_test.cpp.s
+
 mem_table_test.o: mem_table_test.cpp.o
 
 .PHONY : mem_table_test.o
@@ -298,6 +325,9 @@ help:
 	@echo "... __/src/memtable.o"
 	@echo "... __/src/memtable.i"
 	@echo "... __/src/memtable.s"
+	@echo "... block_test.o"
+	@echo "... block_test.i"
+	@echo "... block_test.s"
 	@echo "... mem_table_test.o"
 	@echo "... mem_table_test.i"
 	@echo "... mem_table_test.s"

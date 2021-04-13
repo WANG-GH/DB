@@ -11,7 +11,7 @@ project(kvengine)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SRC "./src/arena.cpp" "./src/memtable.cpp")
+set(SRC "./src/arena.cpp" "./src/memtable.cpp" include/block.h include/key.h include/block_builder.h include/iterator.h)
 include_directories(${CMAKE_SOURCE_DIR}/include )
 
 add_executable(kvengine main.cpp ${SRC}  )

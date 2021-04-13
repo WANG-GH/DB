@@ -8,7 +8,7 @@
 #
 add_subdirectory(googletest)
 include_directories(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
-set(SRC "../src/memtable.cpp" "../src/arena.cpp")
+set(SRC "../src/memtable.cpp" "../src/arena.cpp" block_test.cpp)
 
 
 add_executable(run_actual_tests  test.cpp  "./mem_table_test.cpp" ${SRC})

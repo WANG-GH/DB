@@ -8,7 +8,8 @@
 
 void MemTable::Add(SequenceNumber seq, ValueType type, const Slice &key, const Slice &value) {
     //seq和type共占16字节，seq 占56字节，type 占8字节
-    table_.Insert(InternalKey(seq,type,key,value));
+    InternalKey* internalKey = new InternalKey(seq,type,key,value);
+    table_.Insert(internalKey);
     memoryUsage_ += 16+key.size() + value.size();
     // Format of an entry is concatenation of:
     //  key_size     : int32 of internal_key.size()
@@ -30,10 +31,10 @@ bool MemTable::Get(const Slice  key, std::string* value, Status* s) {
     InternalKey lookup_key = InternalKey(UINT64_MAX,kTypeValue,key,"");
     //实际就是跳表里的Iterator
     Table::Iterator iter(&table_);
-    iter.Seek(lookup_key);
+    iter.Seek(&lookup_key);
     if (iter.Valid()) {
-        const InternalKey entry = iter.key();
-        value->assign(entry.user_value.data(),entry.user_value.size());
+        const InternalKey* entry = iter.key();
+        value->assign(entry->user_value.data(),entry->user_value.size());
         return true;
     }
     return false;
