@@ -396,6 +396,18 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/mnt/d/home/workspace/kvengine/include/block.h">
+			<Option target="kvengine"/>
+		</Unit>
+		<Unit filename="/mnt/d/home/workspace/kvengine/include/block_builder.h">
+			<Option target="kvengine"/>
+		</Unit>
+		<Unit filename="/mnt/d/home/workspace/kvengine/include/iterator.h">
+			<Option target="kvengine"/>
+		</Unit>
+		<Unit filename="/mnt/d/home/workspace/kvengine/include/key.h">
+			<Option target="kvengine"/>
+		</Unit>
 		<Unit filename="/mnt/d/home/workspace/kvengine/main.cpp">
 			<Option target="kvengine"/>
 		</Unit>
@@ -405,6 +417,9 @@
 		</Unit>
 		<Unit filename="/mnt/d/home/workspace/kvengine/src/memtable.cpp">
 			<Option target="kvengine"/>
+			<Option target="run_actual_tests"/>
+		</Unit>
+		<Unit filename="/mnt/d/home/workspace/kvengine/tests/block_test.cpp">
 			<Option target="run_actual_tests"/>
 		</Unit>
 		<Unit filename="/mnt/d/home/workspace/kvengine/tests/googletest/googlemock/src/gmock-all.cc">
