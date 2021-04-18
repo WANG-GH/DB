@@ -35,29 +35,60 @@ TEST(CacheTest, TestHandleTable){
 uint32_t Hhash(Slice str){
     return Hash(str.data(), str.size(),1);
 }
-TEST(CacheTest, TestLRUCache1)
-{
-//    //want not pass
-//    LRUCache* lc= new LRUCache();
-//    lc->SetCapacity(10);
-//    for(int i = 0 ; i < 100 ; i++)
-//    {
-//        Slice s = "Key_data" + std::to_string(i);
-//        lc->Insert(s, Hhash(s), nullptr, 1, nullptr);
-//    }
-//    delete lc;
+
+TEST(CacheTest, TestLRUCache1){
+    LRUCache* lc= new LRUCache();
+    lc->SetCapacity(10);
+    LRUHandle** handles = new LRUHandle*[100];
+    for(int i = 0 ; i < 100 ; i++)
+    {
+        Slice s = "Key_data" + std::to_string(i);
+        handles[i] =  lc->Insert(s, Hhash(s), nullptr, 1,
+                                 [] (const Slice&, void* value)->void{
+                                        return;
+                                    });
+    }
+    Slice s = "Key_data" + std::to_string(5);
+    LRUHandle* h =  lc->Lookup(s, Hhash(s));
+    ASSERT_FALSE(strcmp(h->key().data(), s.data()));
+    lc->Release(h);
+    s = "Key_data666";
+    h = lc->Lookup(s, Hhash(s));
+    ASSERT_TRUE(h == nullptr);
+
+    for(int i = 0; i < 100 ; i++)
+        lc->Release(handles[i]);
+
+    //when delete LRUCache, must promise the in_use is empty
+    //otherwise it will touch the assert in LRUCache assert
+    delete lc;
 }
 
-TEST(CacheTest, TestLRUCache2){
-//    LRUCache* lc= new LRUCache();
-//    lc->SetCapacity(10);
-//    for(int i = 0 ; i < 100 ; i++)
-//    {
-//        Slice s = "Key_data" + std::to_string(i);
-//        lc->Insert(s, Hhash(s), nullptr, 1, nullptr);
-//    }
-//    Slice s = "Key_data" + std::to_string(5);
-//    LRUHandle* h =  lc->Lookup(s, Hhash(s));
-//    ASSERT_FALSE(strcmp(h->key().data(), s.data()));
+TEST(CacheTest, TestCache)
+{
+    Cache* c= new Cache(40);
+    LRUHandle** handles = new LRUHandle*[100];
+    for(int i = 0 ; i < 100 ; i++)
+    {
+        Slice s = "Key_data" + std::to_string(i);
+        handles[i] =  c->Insert(s, nullptr, 1,
+                                 [] (const Slice&, void* value)->void{
+                                     return;
+                                 });
+    }
+    Slice s = "Key_data" + std::to_string(5);
+    LRUHandle* h =  c->Lookup(s);
+    ASSERT_FALSE(strcmp(h->key().data(), s.data()));
+    c->Release(h);
+    s = "Key_data666";
+    h = c->Lookup(s);
+    ASSERT_TRUE(h == nullptr);
 
+    for(int i = 0; i < 100 ; i++)
+        c->Release(handles[i]);
+
+    delete[] handles;
+    //when delete LRUCache, must promise the in_use is empty
+    //otherwise it will touch the assert in LRUCache assert
+    delete c;
 }

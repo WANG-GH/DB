@@ -7,10 +7,11 @@
 
 #include <set>
 #include <vector>
+#include <algorithm>
 #include "dbformat.h"
 #include "version_edit.h"
 #include "status.h"
-
+#include "table_cache.h"
 class Version{
 public:
     // Lookup the value for key.  If found, store it in *val and
@@ -21,8 +22,8 @@ public:
         int seek_file_level;
     };
 
-    //Status Get(const LookupKey& key, std::string* val,
-    //           GetStats* stats);
+    Status Get(const LookupKey& key, std::string* val,
+               GetStats* stats);
 
     void Ref();
     void Unref();
@@ -46,6 +47,9 @@ private:
     int refs_;          // Number of live refs to this version
 
     std::vector<FileMetaData*> files_[config::kNumLevels];
+
+    void ForEachOverlapping(Slice user_key, Slice internal_key, void* arg,
+                            bool (*func)(void*, int, FileMetaData*));
 };
 
 class VersionSet{
@@ -57,8 +61,10 @@ public:
     //uni64_t file number
     void AddLiveFiles(std::set<uint64_t>* live);
 private:
+    friend class Version;
     class Builder;
     void Finalize(Version* v);
+    TableCache* table_;
 };
 
 
