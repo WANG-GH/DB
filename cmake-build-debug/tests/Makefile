@@ -299,6 +299,33 @@ __/src/status.cpp.s:
 	cd /home/yeye/桌面/DB/cmake-build-debug && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/run_actual_tests.dir/build.make tests/CMakeFiles/run_actual_tests.dir/__/src/status.cpp.s
 .PHONY : __/src/status.cpp.s
 
+cache_test.o: cache_test.cpp.o
+
+.PHONY : cache_test.o
+
+# target to build an object file
+cache_test.cpp.o:
+	cd /home/yeye/桌面/DB/cmake-build-debug && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/run_actual_tests.dir/build.make tests/CMakeFiles/run_actual_tests.dir/cache_test.cpp.o
+.PHONY : cache_test.cpp.o
+
+cache_test.i: cache_test.cpp.i
+
+.PHONY : cache_test.i
+
+# target to preprocess a source file
+cache_test.cpp.i:
+	cd /home/yeye/桌面/DB/cmake-build-debug && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/run_actual_tests.dir/build.make tests/CMakeFiles/run_actual_tests.dir/cache_test.cpp.i
+.PHONY : cache_test.cpp.i
+
+cache_test.s: cache_test.cpp.s
+
+.PHONY : cache_test.s
+
+# target to generate assembly for a file
+cache_test.cpp.s:
+	cd /home/yeye/桌面/DB/cmake-build-debug && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/run_actual_tests.dir/build.make tests/CMakeFiles/run_actual_tests.dir/cache_test.cpp.s
+.PHONY : cache_test.cpp.s
+
 env_test.o: env_test.cpp.o
 
 .PHONY : env_test.o
@@ -405,6 +432,9 @@ help:
 	@echo "... __/src/status.o"
 	@echo "... __/src/status.i"
 	@echo "... __/src/status.s"
+	@echo "... cache_test.o"
+	@echo "... cache_test.i"
+	@echo "... cache_test.s"
 	@echo "... env_test.o"
 	@echo "... env_test.i"
 	@echo "... env_test.s"

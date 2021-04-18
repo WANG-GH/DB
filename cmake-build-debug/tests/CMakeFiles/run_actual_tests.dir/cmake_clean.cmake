@@ -3,6 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/run_actual_tests.dir/__/src/env.cpp.o"
   "CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.o"
   "CMakeFiles/run_actual_tests.dir/__/src/status.cpp.o"
+  "CMakeFiles/run_actual_tests.dir/cache_test.cpp.o"
   "CMakeFiles/run_actual_tests.dir/env_test.cpp.o"
   "CMakeFiles/run_actual_tests.dir/mem_table_test.cpp.o"
   "CMakeFiles/run_actual_tests.dir/test.cpp.o"

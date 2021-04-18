@@ -168,6 +168,45 @@ CMakeFiles/kvengine.dir/src/version_set.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/kvengine.dir/src/version_set.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/yeye/桌面/DB/src/version_set.cpp -o CMakeFiles/kvengine.dir/src/version_set.cpp.s
 
+CMakeFiles/kvengine.dir/src/cache.cpp.o: CMakeFiles/kvengine.dir/flags.make
+CMakeFiles/kvengine.dir/src/cache.cpp.o: ../src/cache.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/kvengine.dir/src/cache.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/kvengine.dir/src/cache.cpp.o -c /home/yeye/桌面/DB/src/cache.cpp
+
+CMakeFiles/kvengine.dir/src/cache.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/kvengine.dir/src/cache.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/yeye/桌面/DB/src/cache.cpp > CMakeFiles/kvengine.dir/src/cache.cpp.i
+
+CMakeFiles/kvengine.dir/src/cache.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/kvengine.dir/src/cache.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/yeye/桌面/DB/src/cache.cpp -o CMakeFiles/kvengine.dir/src/cache.cpp.s
+
+CMakeFiles/kvengine.dir/src/table_cache.cpp.o: CMakeFiles/kvengine.dir/flags.make
+CMakeFiles/kvengine.dir/src/table_cache.cpp.o: ../src/table_cache.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/kvengine.dir/src/table_cache.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/kvengine.dir/src/table_cache.cpp.o -c /home/yeye/桌面/DB/src/table_cache.cpp
+
+CMakeFiles/kvengine.dir/src/table_cache.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/kvengine.dir/src/table_cache.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/yeye/桌面/DB/src/table_cache.cpp > CMakeFiles/kvengine.dir/src/table_cache.cpp.i
+
+CMakeFiles/kvengine.dir/src/table_cache.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/kvengine.dir/src/table_cache.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/yeye/桌面/DB/src/table_cache.cpp -o CMakeFiles/kvengine.dir/src/table_cache.cpp.s
+
+CMakeFiles/kvengine.dir/src/table.cpp.o: CMakeFiles/kvengine.dir/flags.make
+CMakeFiles/kvengine.dir/src/table.cpp.o: ../src/table.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/kvengine.dir/src/table.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/kvengine.dir/src/table.cpp.o -c /home/yeye/桌面/DB/src/table.cpp
+
+CMakeFiles/kvengine.dir/src/table.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/kvengine.dir/src/table.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/yeye/桌面/DB/src/table.cpp > CMakeFiles/kvengine.dir/src/table.cpp.i
+
+CMakeFiles/kvengine.dir/src/table.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/kvengine.dir/src/table.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/yeye/桌面/DB/src/table.cpp -o CMakeFiles/kvengine.dir/src/table.cpp.s
+
 # Object files for target kvengine
 kvengine_OBJECTS = \
 "CMakeFiles/kvengine.dir/main.cpp.o" \
@@ -176,7 +215,10 @@ kvengine_OBJECTS = \
 "CMakeFiles/kvengine.dir/src/YeapDB.cpp.o" \
 "CMakeFiles/kvengine.dir/src/env.cpp.o" \
 "CMakeFiles/kvengine.dir/src/status.cpp.o" \
-"CMakeFiles/kvengine.dir/src/version_set.cpp.o"
+"CMakeFiles/kvengine.dir/src/version_set.cpp.o" \
+"CMakeFiles/kvengine.dir/src/cache.cpp.o" \
+"CMakeFiles/kvengine.dir/src/table_cache.cpp.o" \
+"CMakeFiles/kvengine.dir/src/table.cpp.o"
 
 # External object files for target kvengine
 kvengine_EXTERNAL_OBJECTS =
@@ -188,9 +230,12 @@ kvengine: CMakeFiles/kvengine.dir/src/YeapDB.cpp.o
 kvengine: CMakeFiles/kvengine.dir/src/env.cpp.o
 kvengine: CMakeFiles/kvengine.dir/src/status.cpp.o
 kvengine: CMakeFiles/kvengine.dir/src/version_set.cpp.o
+kvengine: CMakeFiles/kvengine.dir/src/cache.cpp.o
+kvengine: CMakeFiles/kvengine.dir/src/table_cache.cpp.o
+kvengine: CMakeFiles/kvengine.dir/src/table.cpp.o
 kvengine: CMakeFiles/kvengine.dir/build.make
 kvengine: CMakeFiles/kvengine.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable kvengine"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable kvengine"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/kvengine.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

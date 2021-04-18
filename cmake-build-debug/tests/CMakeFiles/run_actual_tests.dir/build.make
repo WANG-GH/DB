@@ -103,9 +103,22 @@ tests/CMakeFiles/run_actual_tests.dir/mem_table_test.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/run_actual_tests.dir/mem_table_test.cpp.s"
 	cd /home/yeye/桌面/DB/cmake-build-debug/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/yeye/桌面/DB/tests/mem_table_test.cpp -o CMakeFiles/run_actual_tests.dir/mem_table_test.cpp.s
 
+tests/CMakeFiles/run_actual_tests.dir/cache_test.cpp.o: tests/CMakeFiles/run_actual_tests.dir/flags.make
+tests/CMakeFiles/run_actual_tests.dir/cache_test.cpp.o: ../tests/cache_test.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/cache_test.cpp.o"
+	cd /home/yeye/桌面/DB/cmake-build-debug/tests && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/run_actual_tests.dir/cache_test.cpp.o -c /home/yeye/桌面/DB/tests/cache_test.cpp
+
+tests/CMakeFiles/run_actual_tests.dir/cache_test.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/run_actual_tests.dir/cache_test.cpp.i"
+	cd /home/yeye/桌面/DB/cmake-build-debug/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/yeye/桌面/DB/tests/cache_test.cpp > CMakeFiles/run_actual_tests.dir/cache_test.cpp.i
+
+tests/CMakeFiles/run_actual_tests.dir/cache_test.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/run_actual_tests.dir/cache_test.cpp.s"
+	cd /home/yeye/桌面/DB/cmake-build-debug/tests && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/yeye/桌面/DB/tests/cache_test.cpp -o CMakeFiles/run_actual_tests.dir/cache_test.cpp.s
+
 tests/CMakeFiles/run_actual_tests.dir/env_test.cpp.o: tests/CMakeFiles/run_actual_tests.dir/flags.make
 tests/CMakeFiles/run_actual_tests.dir/env_test.cpp.o: ../tests/env_test.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/env_test.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/env_test.cpp.o"
 	cd /home/yeye/桌面/DB/cmake-build-debug/tests && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/run_actual_tests.dir/env_test.cpp.o -c /home/yeye/桌面/DB/tests/env_test.cpp
 
 tests/CMakeFiles/run_actual_tests.dir/env_test.cpp.i: cmake_force
@@ -118,7 +131,7 @@ tests/CMakeFiles/run_actual_tests.dir/env_test.cpp.s: cmake_force
 
 tests/CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.o: tests/CMakeFiles/run_actual_tests.dir/flags.make
 tests/CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.o: ../src/memtable.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.o"
 	cd /home/yeye/桌面/DB/cmake-build-debug/tests && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.o -c /home/yeye/桌面/DB/src/memtable.cpp
 
 tests/CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.i: cmake_force
@@ -131,7 +144,7 @@ tests/CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.s: cmake_force
 
 tests/CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.o: tests/CMakeFiles/run_actual_tests.dir/flags.make
 tests/CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.o: ../src/arena.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.o"
 	cd /home/yeye/桌面/DB/cmake-build-debug/tests && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.o -c /home/yeye/桌面/DB/src/arena.cpp
 
 tests/CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.i: cmake_force
@@ -144,7 +157,7 @@ tests/CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.s: cmake_force
 
 tests/CMakeFiles/run_actual_tests.dir/__/src/env.cpp.o: tests/CMakeFiles/run_actual_tests.dir/flags.make
 tests/CMakeFiles/run_actual_tests.dir/__/src/env.cpp.o: ../src/env.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/__/src/env.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/__/src/env.cpp.o"
 	cd /home/yeye/桌面/DB/cmake-build-debug/tests && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/run_actual_tests.dir/__/src/env.cpp.o -c /home/yeye/桌面/DB/src/env.cpp
 
 tests/CMakeFiles/run_actual_tests.dir/__/src/env.cpp.i: cmake_force
@@ -157,7 +170,7 @@ tests/CMakeFiles/run_actual_tests.dir/__/src/env.cpp.s: cmake_force
 
 tests/CMakeFiles/run_actual_tests.dir/__/src/status.cpp.o: tests/CMakeFiles/run_actual_tests.dir/flags.make
 tests/CMakeFiles/run_actual_tests.dir/__/src/status.cpp.o: ../src/status.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/__/src/status.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object tests/CMakeFiles/run_actual_tests.dir/__/src/status.cpp.o"
 	cd /home/yeye/桌面/DB/cmake-build-debug/tests && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/run_actual_tests.dir/__/src/status.cpp.o -c /home/yeye/桌面/DB/src/status.cpp
 
 tests/CMakeFiles/run_actual_tests.dir/__/src/status.cpp.i: cmake_force
@@ -172,6 +185,7 @@ tests/CMakeFiles/run_actual_tests.dir/__/src/status.cpp.s: cmake_force
 run_actual_tests_OBJECTS = \
 "CMakeFiles/run_actual_tests.dir/test.cpp.o" \
 "CMakeFiles/run_actual_tests.dir/mem_table_test.cpp.o" \
+"CMakeFiles/run_actual_tests.dir/cache_test.cpp.o" \
 "CMakeFiles/run_actual_tests.dir/env_test.cpp.o" \
 "CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.o" \
 "CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.o" \
@@ -183,6 +197,7 @@ run_actual_tests_EXTERNAL_OBJECTS =
 
 tests/run_actual_tests: tests/CMakeFiles/run_actual_tests.dir/test.cpp.o
 tests/run_actual_tests: tests/CMakeFiles/run_actual_tests.dir/mem_table_test.cpp.o
+tests/run_actual_tests: tests/CMakeFiles/run_actual_tests.dir/cache_test.cpp.o
 tests/run_actual_tests: tests/CMakeFiles/run_actual_tests.dir/env_test.cpp.o
 tests/run_actual_tests: tests/CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.o
 tests/run_actual_tests: tests/CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.o
@@ -193,7 +208,7 @@ tests/run_actual_tests: lib/libgtestd.a
 tests/run_actual_tests: lib/libgtest_maind.a
 tests/run_actual_tests: lib/libgtestd.a
 tests/run_actual_tests: tests/CMakeFiles/run_actual_tests.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable run_actual_tests"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/yeye/桌面/DB/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable run_actual_tests"
 	cd /home/yeye/桌面/DB/cmake-build-debug/tests && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/run_actual_tests.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

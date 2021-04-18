@@ -335,6 +335,33 @@ src/arena.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/arena.cpp.s
 .PHONY : src/arena.cpp.s
 
+src/cache.o: src/cache.cpp.o
+
+.PHONY : src/cache.o
+
+# target to build an object file
+src/cache.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/cache.cpp.o
+.PHONY : src/cache.cpp.o
+
+src/cache.i: src/cache.cpp.i
+
+.PHONY : src/cache.i
+
+# target to preprocess a source file
+src/cache.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/cache.cpp.i
+.PHONY : src/cache.cpp.i
+
+src/cache.s: src/cache.cpp.s
+
+.PHONY : src/cache.s
+
+# target to generate assembly for a file
+src/cache.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/cache.cpp.s
+.PHONY : src/cache.cpp.s
+
 src/env.o: src/env.cpp.o
 
 .PHONY : src/env.o
@@ -416,6 +443,60 @@ src/status.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/status.cpp.s
 .PHONY : src/status.cpp.s
 
+src/table.o: src/table.cpp.o
+
+.PHONY : src/table.o
+
+# target to build an object file
+src/table.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/table.cpp.o
+.PHONY : src/table.cpp.o
+
+src/table.i: src/table.cpp.i
+
+.PHONY : src/table.i
+
+# target to preprocess a source file
+src/table.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/table.cpp.i
+.PHONY : src/table.cpp.i
+
+src/table.s: src/table.cpp.s
+
+.PHONY : src/table.s
+
+# target to generate assembly for a file
+src/table.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/table.cpp.s
+.PHONY : src/table.cpp.s
+
+src/table_cache.o: src/table_cache.cpp.o
+
+.PHONY : src/table_cache.o
+
+# target to build an object file
+src/table_cache.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/table_cache.cpp.o
+.PHONY : src/table_cache.cpp.o
+
+src/table_cache.i: src/table_cache.cpp.i
+
+.PHONY : src/table_cache.i
+
+# target to preprocess a source file
+src/table_cache.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/table_cache.cpp.i
+.PHONY : src/table_cache.cpp.i
+
+src/table_cache.s: src/table_cache.cpp.s
+
+.PHONY : src/table_cache.s
+
+# target to generate assembly for a file
+src/table_cache.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvengine.dir/build.make CMakeFiles/kvengine.dir/src/table_cache.cpp.s
+.PHONY : src/table_cache.cpp.s
+
 src/version_set.o: src/version_set.cpp.o
 
 .PHONY : src/version_set.o
@@ -470,6 +551,9 @@ help:
 	@echo "... src/arena.o"
 	@echo "... src/arena.i"
 	@echo "... src/arena.s"
+	@echo "... src/cache.o"
+	@echo "... src/cache.i"
+	@echo "... src/cache.s"
 	@echo "... src/env.o"
 	@echo "... src/env.i"
 	@echo "... src/env.s"
@@ -479,6 +563,12 @@ help:
 	@echo "... src/status.o"
 	@echo "... src/status.i"
 	@echo "... src/status.s"
+	@echo "... src/table.o"
+	@echo "... src/table.i"
+	@echo "... src/table.s"
+	@echo "... src/table_cache.o"
+	@echo "... src/table_cache.i"
+	@echo "... src/table_cache.s"
 	@echo "... src/version_set.o"
 	@echo "... src/version_set.i"
 	@echo "... src/version_set.s"

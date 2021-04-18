@@ -387,6 +387,9 @@
 		<Unit filename="/home/yeye/桌面/DB/include/YeapDB.h">
 			<Option target="kvengine"/>
 		</Unit>
+		<Unit filename="/home/yeye/桌面/DB/include/cache.h">
+			<Option target="kvengine"/>
+		</Unit>
 		<Unit filename="/home/yeye/桌面/DB/include/dbformat.h">
 			<Option target="kvengine"/>
 		</Unit>
@@ -394,6 +397,9 @@
 			<Option target="kvengine"/>
 		</Unit>
 		<Unit filename="/home/yeye/桌面/DB/include/options.h">
+			<Option target="kvengine"/>
+		</Unit>
+		<Unit filename="/home/yeye/桌面/DB/include/table.h">
 			<Option target="kvengine"/>
 		</Unit>
 		<Unit filename="/home/yeye/桌面/DB/include/table_cache.h">
@@ -415,6 +421,9 @@
 			<Option target="kvengine"/>
 			<Option target="run_actual_tests"/>
 		</Unit>
+		<Unit filename="/home/yeye/桌面/DB/src/cache.cpp">
+			<Option target="kvengine"/>
+		</Unit>
 		<Unit filename="/home/yeye/桌面/DB/src/env.cpp">
 			<Option target="kvengine"/>
 			<Option target="run_actual_tests"/>
@@ -427,8 +436,17 @@
 			<Option target="kvengine"/>
 			<Option target="run_actual_tests"/>
 		</Unit>
+		<Unit filename="/home/yeye/桌面/DB/src/table.cpp">
+			<Option target="kvengine"/>
+		</Unit>
+		<Unit filename="/home/yeye/桌面/DB/src/table_cache.cpp">
+			<Option target="kvengine"/>
+		</Unit>
 		<Unit filename="/home/yeye/桌面/DB/src/version_set.cpp">
 			<Option target="kvengine"/>
+		</Unit>
+		<Unit filename="/home/yeye/桌面/DB/tests/cache_test.cpp">
+			<Option target="run_actual_tests"/>
 		</Unit>
 		<Unit filename="/home/yeye/桌面/DB/tests/env_test.cpp">
 			<Option target="run_actual_tests"/>
