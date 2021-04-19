@@ -107,13 +107,17 @@ Status FileState::Append(const Slice &data) {
 
         avail = (avail > src_len) ? src_len : avail;
 
-        memcpy(blocks_.back(), src, avail);
+        memcpy(blocks_.back() + offset, src, avail);
         src_len -= avail;
         src += avail;
         size_ += avail;
     }
 
     return Status::OK();
+}
+
+size_t FileState::DebugBlockSize() {
+    return blocks_.size();
 }
 
 Status RandomAccessFile::Read(uint32_t offset, size_t n,

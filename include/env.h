@@ -26,6 +26,7 @@ public:
     void Truncate();
     Status Read(uint64_t offset, size_t n, Slice* result, char* scratch) const;
     Status Append(const Slice& data);
+    size_t DebugBlockSize();
 private:
     const int kBlockSize = 8 * 1024;
     int refs_;

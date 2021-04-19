@@ -3,6 +3,7 @@
 //
 
 #include  "block.h"
+
 int32_t DecodeFixed32(const char * buf){
     int32_t n;
     memcpy(&n,buf,4);

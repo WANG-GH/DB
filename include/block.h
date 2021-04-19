@@ -12,7 +12,9 @@
 #include "coding.h"
 
 class BlockIterator;
+
 int32_t DecodeFixed32(const char * buf);
+
 class Block {
     friend class BlockIterator;
 public:
