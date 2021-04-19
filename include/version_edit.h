@@ -6,11 +6,11 @@
 #define KVENGINE_VERSION_EDIT_H
 //#include <utility>
 #include <vector>
-#include "version_set.h"
 #include "dbformat.h"
 #include "status.h"
+#include <set>
 class VersionSet;
-
+class Version;
 //recode the file data
 struct FileMetaData{
     FileMetaData() : refs(0), allowed_seeks(1 << 30), file_size(0) {}
@@ -27,19 +27,10 @@ struct FileMetaData{
 class VersionEdit{
 public:
     void AddFile(int level, uint64_t file, uint64_t file_size,
-                 const InternalKey& smallest, const InternalKey& largest) {
-        FileMetaData f;
-        f.number = file;
-        f.file_size = file_size;
-        f.smallest = smallest;
-        f.largest = largest;
-        new_files_.push_back(std::make_pair(level, f));
-    }
+                 const InternalKey& smallest, const InternalKey& largest);
 
     // REQUIRES: This version has not been saved (see VersionSet::SaveTo)
-    void RemoveFile(int level, uint64_t file) {
-        deleted_files_.insert(std::make_pair(level, file));
-    }
+    void RemoveFile(int level, uint64_t file) ;
 
     //for manifest
     void EncodeTo(std::string* dst) const;

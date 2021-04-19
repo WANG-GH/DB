@@ -5,6 +5,8 @@
 #ifndef KVENGINE_ITERATOR_H
 #define KVENGINE_ITERATOR_H
 #include "slice.h"
+#include "block.h"
+
 class Block;
 
 class Iterator {
@@ -104,7 +106,6 @@ private:
     Block * block;
     int id;
 };
-
 
 
 #endif //KVENGINE_ITERATOR_H

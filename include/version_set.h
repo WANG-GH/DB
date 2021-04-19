@@ -61,6 +61,7 @@ public:
     //uni64_t file number
     void AddLiveFiles(std::set<uint64_t>* live);
 private:
+    //Status WriteSnapshot(Writer log);
     friend class Version;
     class Builder;
     void Finalize(Version* v);
