@@ -6,7 +6,7 @@
 #define KVENGINE_TABLE_H
 #include "env.h"
 #include "options.h"
-#include "iterator.h"
+//#include "iterator.h"
 #include "block.h"
 class Table{
     static Status Open(const Options& options, RandomAccessFile* file,
@@ -20,7 +20,7 @@ private:
     Status InternalGet(const Slice& key, void* arg,
                        void (*handle_result)(void* arg, const Slice& k, const Slice& v));
     Rep* const rep_;
-    static Iterator* BlockReader(void* arg, const Slice& index_value)
+    //static Iterator* BlockReader(void* arg, const Slice& index_value)
 };
 
 #endif //KVENGINE_TABLE_H

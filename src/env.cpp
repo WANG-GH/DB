@@ -124,3 +124,7 @@ Status RandomAccessFile::Read(uint32_t offset, size_t n,
 RandomAccessFile::~RandomAccessFile() {
     file_->Unref();
 }
+
+Status WritableFile::Append(const Slice &data) {
+    return file_->Append(data);
+}

@@ -12,11 +12,7 @@
 #include "coding.h"
 
 class BlockIterator;
-int32_t DecodeFixed32(const char * buf){
-    int32_t n;
-    memcpy(&n,buf,4);
-    return n;
-}
+int32_t DecodeFixed32(const char * buf);
 class Block {
     friend class BlockIterator;
 public:

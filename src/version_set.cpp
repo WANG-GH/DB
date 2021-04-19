@@ -81,33 +81,33 @@ Version::ForEachOverlapping(Slice user_key, Slice internal_key, void *arg,
 }
 
 Status Version::Get(const LookupKey &key, std::string *val, Version::GetStats *stats) {
-    struct State{
-        Saver saver;
-        GetStats* stats;
-        FileMetaData* last_find_file;
-        int last_file_read_level;
-        bool find;
-        Slice ikey;
-        Status s;
-        VersionSet* vset;
-
-        bool Match(void* arg, int n, FileMetaData* f)
-        {
-            State* state = reinterpret_cast<State*>(arg);
-
-            //we have more than one file?
-            if(state->stats->seek_file == nullptr
-                && state->last_find_file != nullptr){
-                state->stats->seek_file = state->last_find_file;
-                state->stats->seek_file_level = state->last_file_read_level;
-            }
-
-            state->last_file_read_level = n;
-            state->s = state->vset->table_->Get(f->number, f->file_size, state->ikey, &state->saver, SaveValue);
-
-
-        }
-    };
+//    struct State{
+//        Saver saver;
+//        GetStats* stats;
+//        FileMetaData* last_find_file;
+//        int last_file_read_level;
+//        bool find;
+//        Slice ikey;
+//        Status s;
+//        VersionSet* vset;
+//
+//        bool Match(void* arg, int n, FileMetaData* f)
+//        {
+//            State* state = reinterpret_cast<State*>(arg);
+//
+//            //we have more than one file?
+//            if(state->stats->seek_file == nullptr
+//                && state->last_find_file != nullptr){
+//                state->stats->seek_file = state->last_find_file;
+//                state->stats->seek_file_level = state->last_file_read_level;
+//            }
+//
+//            state->last_file_read_level = n;
+//            state->s = state->vset->table_->Get(f->number, f->file_size, state->ikey, &state->saver, SaveValue);
+//
+//
+//        }
+//    };
 }
 
 

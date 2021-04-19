@@ -46,4 +46,19 @@ public:
 private:
     FileState* file_;
 };
+
+class WritableFile{
+public:
+    WritableFile(FileState* file): file_(file){file->Ref();}
+    ~WritableFile() { file_->Unref(); }
+
+    Status Append(const Slice& data);
+    Status Flush();
+    Status Close();
+
+private:
+    FileState* file_;
+};
+
+
 #endif //KVENGINE_ENV_H
