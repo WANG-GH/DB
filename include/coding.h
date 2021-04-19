@@ -56,7 +56,7 @@ inline uint64_t DecodeFixed64(const char* ptr) {
            (static_cast<uint64_t>(buffer[6]) << 48) |
            (static_cast<uint64_t>(buffer[7]) << 56);
 }
-//
+
 //void PutFixed32(std::string* dst, uint32_t value) {
 //    char buf[sizeof(value)];
 //    EncodeFixed32(buf, value);

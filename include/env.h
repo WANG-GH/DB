@@ -17,13 +17,7 @@ constexpr const int kOpenBaseFlags = O_CLOEXEC;
 constexpr const int kOpenBaseFlags = 0;
 #endif  // defined(HAVE_O_CLOEXEC)
 constexpr const size_t kWritableFileBufferSize = 65536;
-Status PosixError(const std::string& context, int error_number) {
-    if (error_number == ENOENT) {
-        return Status::NotFound(context, std::strerror(error_number));
-    } else {
-        return Status::IOError(context, std::strerror(error_number));
-    }
-}
+
 class Env{
 public:
     Status CreateDir(std::string& dirname);
