@@ -51,7 +51,7 @@ public:
         return (id>=0) && (id<block->items.size());
     }
 
- void SeekToFirst() {
+    void SeekToFirst() {
         id=0;
     }
 
@@ -59,7 +59,7 @@ public:
         id = block->items.size();
     }
     //binary search, find the key >= target
- void Seek(const Slice& target) {
+    void Seek(const Slice& target) {
         int left = 0,right=block->items.size()-1;
         while (left<right){
             int mid = left+right>>1;
@@ -69,7 +69,7 @@ public:
             else if(block->items[mid]->user_key.compare(target) < 0){
                 left = mid+1;
             }
-                    else{
+            else{
                 id = mid;
                 return ;
             }

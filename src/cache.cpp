@@ -134,7 +134,6 @@ LRUCache::Insert(const Slice &key, uint32_t hash, void *value,
         e->next = nullptr;
     }
 
-    //not understand. why old = lru next? lru_next and lru_??
     while (usage_ > capacity_ && lru_.next != &lru_) {
         LRUHandle* old = lru_.next;
         //assert(old->refs == 1);
@@ -173,7 +172,7 @@ void LRUCache::LRU_Remove(LRUHandle *e) {
 
 //safely handle the LRUHandle. delete or move to the head
 void LRUCache::Unref(LRUHandle* e) {
-    //assert(e->refs > 0);
+    assert(e->refs > 0);
     e->refs--;
     if (e->refs == 0) {  // Deallocate.
         assert(!e->in_cache);
@@ -295,6 +294,7 @@ Slice LRUHandle::key() const {
 
 LRUHandle *Cache::Insert(const Slice &key, void *value, size_t charge, void (*deleter)(const Slice &, void *)) {
     uint32_t hash = HashSlice(key);
+    uint32_t x = Shard(hash);
     return shared_[Shard(hash)].Insert(key, hash, value, charge, deleter);
 }
 
@@ -339,11 +339,11 @@ uint32_t Cache::HashSlice(const Slice &s) {
 }
 
 uint32_t Cache::Shard(uint32_t hash) {
-    return hash >> (32 - 16);
+    return hash % 4;
 }
 
 Cache::Cache(size_t capacity) {
-    const size_t per_shard = (capacity + (4 - 1)) / 4;
+    const size_t per_shard = (capacity + 3) / 4;
     for (int s = 0; s < 4; s++) {
         shared_[s].SetCapacity(per_shard);
     }
