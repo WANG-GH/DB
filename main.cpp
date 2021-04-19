@@ -4,6 +4,7 @@
 #include "cache.h"
 
 int main() {
-
+    printf("hello db!");
+    return 0;
 }
 

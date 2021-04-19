@@ -44,7 +44,10 @@ public:
     virtual ~BlockIterator(){
         delete block;
     }
-   bool Valid() const{
+   InternalKey* InternalKey(){
+        return block->items[id];
+    }
+    bool Valid() const{
         return (id>=0) && (id<block->items.size());
     }
 
@@ -101,4 +104,7 @@ private:
     Block * block;
     int id;
 };
+
+
+
 #endif //KVENGINE_ITERATOR_H

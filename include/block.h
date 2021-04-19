@@ -6,17 +6,13 @@
 #define KVENGINE_BLOCK_H
 
 #include <vector>
-//#include "key.h"
+
 #include "dbformat.h"
 #include "slice.h"
 #include "coding.h"
 
 class BlockIterator;
-int32_t DecodeFixed32(const char * buf){
-    int32_t n;
-    memcpy(&n,buf,4);
-    return n;
-}
+
 class Block {
     friend class BlockIterator;
 public:
