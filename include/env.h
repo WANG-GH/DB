@@ -7,21 +7,18 @@
 
 #include <string>
 #include <vector>
-#include <fcntl.h>
-#include "status.h"
-
-// Common flags defined for all posix open operations
-#if defined(HAVE_O_CLOEXEC)
-constexpr const int kOpenBaseFlags = O_CLOEXEC;
-#else
-constexpr const int kOpenBaseFlags = 0;
-#endif  // defined(HAVE_O_CLOEXEC)
-constexpr const size_t kWritableFileBufferSize = 65536;
-
+#include "slice.h"
+class RandomAccessFile;
+class WritableFile;
+class FileState;
 class Env{
 public:
-    Status CreateDir(std::string& dirname);
-    Status FileExists(std::string& fname);
+    virtual bool NewWritableFile(const std::string& fname,
+                                 WritableFile** result) = 0;
+    virtual bool NewRandomAccessFile(const std::string& fname,
+                                     RandomAccessFile** result) = 0;
+    virtual bool CreateDir(std::string& dirname) = 0;
+    virtual bool FileExists(std::string& fname) = 0;
 };
 
 class FileState{
@@ -34,8 +31,9 @@ public:
     void Unref();
     uint64_t Size() const;
     void Truncate();
-    Status Read(uint64_t offset, size_t n, Slice* result, char* scratch) const;
-    Status Append(const Slice& data);
+    bool Read(uint64_t offset, size_t n, Slice* result, char* scratch) const;
+    bool Append(const Slice& data);
+    size_t DebugBlockSize();
 private:
     const int kBlockSize = 8 * 1024;
     int refs_;
@@ -45,31 +43,97 @@ private:
 
 class RandomAccessFile{
 public:
-    RandomAccessFile(FileState* file): file_(file){file_->Ref();} ;
+    RandomAccessFile() = default;
     RandomAccessFile(const RandomAccessFile&) = delete;
     RandomAccessFile& operator=(const RandomAccessFile&) = delete;
-    ~RandomAccessFile();
+    virtual ~RandomAccessFile() = default;
 
-    Status Read(uint32_t offset, size_t n, Slice* result,
-                char* scratch) const ;
+    virtual bool Read(uint64_t offset, size_t n, Slice* result,
+                      char* scratch) const = 0;
+};
 
+class MemRandomAccessFile: public RandomAccessFile{
+public:
+    MemRandomAccessFile(FileState* file): file_(file){file_->Ref();} ;
+    ~MemRandomAccessFile() override;
+
+    bool Read(uint32_t offset, size_t n, Slice* result,
+              char* scratch) const ;
 private:
     FileState* file_;
 };
-
 
 class WritableFile{
 public:
-    WritableFile(FileState* file): file_(file){file->Ref();}
-    ~WritableFile() { file_->Unref(); }
+    WritableFile()= default;
+    WritableFile(const WritableFile&) = delete;
+    WritableFile& operator=(const WritableFile&) = delete;
+    virtual ~WritableFile() = default;
 
-    Status Append(const Slice& data);
-    Status Flush();
-    Status Close();
+    virtual bool Append(const Slice& data) = 0;
+    virtual bool Flush() = 0;
+    virtual bool Close() = 0;
+};
+
+class MemWritableFile: public WritableFile{
+public:
+    MemWritableFile(FileState* file): file_(file){file->Ref();}
+    ~MemWritableFile() { file_->Unref(); }
+
+    bool Append(const Slice& data);
+    //bool Flush();
+    //bool Close();
 
 private:
     FileState* file_;
 };
 
+class MemEnv : public Env{
+    bool NewWritableFile(const std::string& fname,
+                         WritableFile** result) override{return true;};
+    bool NewRandomAccessFile(const std::string& fname,
+                             RandomAccessFile** result) override{return true;};
+    bool CreateDir(std::string& dirname)  override{return true;};
+    bool FileExists(std::string& fname) override{return true;};
+};
 
+class PosixEnv : public Env{
+    bool NewWritableFile(const std::string& fname,
+                         WritableFile** result) override;
+    bool NewRandomAccessFile(const std::string& fname,
+                             RandomAccessFile** result) override;
+    bool CreateDir(std::string& dirname)  override;
+    bool FileExists(std::string& fname) override;
+};
+
+const int kBufferSize = 1024*64;
+class PosixWritableFile: public WritableFile{
+public:
+    PosixWritableFile(int fd): fd_(fd){}
+    ~PosixWritableFile();
+    bool Append(const Slice& data) override;
+    bool Flush() override;
+    bool Close() override;
+private:
+    bool FlushBuffer();
+    bool WriteUnbuffered(const char* data, size_t size);
+    int fd_;
+    std::string dbname_;
+    std::string dirname_;
+    size_t pos_;
+    char buf_[kBufferSize];
+};
+
+class PosixRandomAccessFile: public RandomAccessFile{
+public:
+    PosixRandomAccessFile(int fd, const std::string& fname):fd_(fd), filename_(fname){};
+    ~PosixRandomAccessFile();
+
+    bool Read(uint64_t offset, size_t n, Slice* result,
+              char* scratch) const;
+
+private:
+    const int fd_;
+    std::string filename_;
+};
 #endif //KVENGINE_ENV_H

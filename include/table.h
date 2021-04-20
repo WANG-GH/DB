@@ -6,12 +6,14 @@
 #define KVENGINE_TABLE_H
 #include "env.h"
 #include "options.h"
+
+#include "status.h"
+
 #include "block.h"
 #include "block_handle.h"
 #include "env.h"
 #include "iterator.h"
 
-typedef Iterator* (*BlockFunction)(void*, const Options&, const Slice&);
 
 class TableIterator;
 class Table{
