@@ -29,6 +29,7 @@ public:
 
     Iterator *NewIterator();
 
+
 private:
     std::vector<InternalKey *> items;
 };
@@ -106,9 +107,6 @@ private:
     int id;
 };
 
-Iterator *Block::NewIterator() {
-    return new BlockIterator(this);
-}
 
 
 #endif //KVENGINE_BLOCK_H

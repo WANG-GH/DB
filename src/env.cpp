@@ -179,6 +179,7 @@ bool PosixWritableFile::WriteUnbuffered(const char *data, size_t size) {
 
 bool PosixWritableFile::Flush() {
     FlushBuffer();
+    return true;
 }
 
 bool PosixWritableFile::FlushBuffer() {
@@ -224,7 +225,7 @@ bool PosixRandomAccessFile::Read(uint64_t offset, size_t n, Slice *result, char 
     size_t length = read(fd_, scratch, n);
     if(length > 0){
         Slice* r = new Slice(scratch, n);
-        result = r;
+        *result = *r;
         return true;
     }
     result = nullptr;

@@ -1,6 +1,8 @@
 //
-// Created by yeye on 2021/4/19.
+// Created by Linfp on 2021/4/20.
 //
 
-#include  "block.h"
-
+#include "block.h"
+Iterator *Block::NewIterator() {
+    return new BlockIterator(this);
+}

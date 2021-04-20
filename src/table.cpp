@@ -18,18 +18,17 @@ Status Table::Open(const Options &options, RandomAccessFile *file, uint64_t file
     }
     char footer_space[Footer::kEncodedLength];
     Slice footer_input;
-    Status s = file->Read(file_size - Footer::kEncodedLength, Footer::kEncodedLength,
+    bool ret = file->Read(file_size - Footer::kEncodedLength, Footer::kEncodedLength,
                           &footer_input, footer_space);
-    if (!s.ok()) return s;
+    if (!ret) return Status();
 
     Footer footer;
-    s = footer.DecodeFrom(&footer_input);
-    if (!s.ok()) return s;
+    Status s  = footer.DecodeFrom(&footer_input);
 
     // Read the index block
     Slice index_block_contents;
     s = ReadBlock(file, options, footer.index_handle(), &index_block_contents);
-    if (s.ok()) {
+
         // We've successfully read the footer and the index block: we're
         // ready to serve requests.
         Block* index_block = new Block(index_block_contents);
@@ -37,7 +36,7 @@ Status Table::Open(const Options &options, RandomAccessFile *file, uint64_t file
         rep->file = file;
         rep->index_block = index_block;
         *table = new Table(rep);
-    }
+
     return s;
 }
 
@@ -63,10 +62,10 @@ Status Table::ReadBlock(RandomAccessFile *file, const Options &options, const Bl
     size_t n = static_cast<size_t>(handle.size());
     char* buf = new char[n];
     Slice contents;
-    Status s = file->Read(handle.offset(), n , &contents, buf);
-    if (!s.ok()) {
+    bool ret = file->Read(handle.offset(), n , &contents, buf);
+    if (!ret) {
         delete[] buf;
-        return s;
+        return Status();
     }
     *result = contents;
     return  Status();

@@ -18,9 +18,11 @@
 class TableIterator;
 class Table{
     friend TableIterator;
-    Status Open(const Options& options, RandomAccessFile* file,
+public:
+    static Status Open(const Options& options, RandomAccessFile* file,
                        uint64_t file_size, Table** table) ;
-
+    static Status ReadBlock(RandomAccessFile *file, const Options &options,
+                            const BlockHandle &handle, Slice *result);
     Table(const Table&) = delete;
     Table& operator=(const Table&) = delete;
     Iterator* NewIterator(const Options&) ;
@@ -30,8 +32,6 @@ private:
     struct Rep;
     Table(Rep* rep): rep_(rep){};
     Status InternalGet(const Slice &key,Slice * value);
-    Status ReadBlock(RandomAccessFile *file, const Options &options,
-                     const BlockHandle &handle, Slice *result);
     Rep* const rep_;
 
     //static Iterator* BlockReader(void* arg, const Slice& index_value)

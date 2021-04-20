@@ -34,20 +34,13 @@ public:
 
     ~TableBuilder();
 
-
-
     void Add(InternalKey* );
-
 
     void Flush();
 
-
-    Status status() const{
-    }
-
+    Status status() const{return Status();}
 
     void Finish();
-
 
 private:
 
@@ -88,7 +81,7 @@ TableBuilder::TableBuilder(const Options &options, WritableFile *file)
 }
 
 TableBuilder::~TableBuilder() {
-    assert(rep_->closed);  // Catch errors where caller forgot to call Finish()
+//    assert(rep_->closed);  // Catch errors where caller forgot to call Finish()
     delete rep_;
 }
 
@@ -114,8 +107,11 @@ void TableBuilder::Add(InternalKey* item) {
 }
 
 void TableBuilder::Finish() {
+    Rep* r = rep_;
     //write data block
     Flush();
+    assert(!r->closed);
+    r->closed = true;
 
     //write indexblock
     if(rep_->pending_index_entry){
@@ -131,6 +127,7 @@ void TableBuilder::Finish() {
     footer.EncodeTo(&footer_encoding);
     rep_->file->Append(footer_encoding);
     rep_->file->Close();
+    rep_->offset+=footer_encoding.size();
     return ;
 }
 
@@ -162,8 +159,9 @@ void TableBuilder::WriteRawBlock(const Slice& block_contents,BlockHandle* handle
     Rep* r = rep_;
     handle->set_offset(r->offset);
     handle->set_size(block_contents.size());
-    r->status = r->file->Append(block_contents);
-    assert(r->status.ok());
+    bool ret = r->file->Append(block_contents);
+    r->offset+= block_contents.size();
+    assert(ret);
 }
 
 #endif //KVENGINE_TABLE_BUILDER_H

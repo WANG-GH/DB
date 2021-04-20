@@ -45,23 +45,24 @@ class InternalKey{
 
 public:
     InternalKey(){}
-    //TODO:字节对齐
     InternalKey(SequenceNumber seq_,ValueType type_,
                 const Slice key_,const Slice value_):
             seq(seq_),type(type_),user_key(key_),user_value(value_){}
     void EncodeTo(std::string *dst){
-        char  buf[4];
+        char  buf[8];
+        memset(buf,0,sizeof(buf));
         memcpy(buf,&seq,8);
         dst->append(buf,8);
-        memcpy(buf,&type,1);
-        dst->append(buf,1);
-        int32_t key_size = user_key.size();
-        memcpy(buf,&key_size,4);
-        dst->append(buf,4);
+        memset(buf,0,sizeof(buf));
+        memcpy(buf,&type,8);
+        dst->append(buf,8);
+        int64_t key_size = user_key.size();
+        memcpy(buf,&key_size,8);
+        dst->append(buf,8);
         dst->append(user_key.data(),user_key.size());
-        int32_t value_size = user_value.size();
-        memcpy(buf,&value_size,4);
-        dst->append(buf,4);
+        int64_t value_size = user_value.size();
+        memcpy(buf,&value_size,8);
+        dst->append(buf,8);
         dst->append(user_value.data(),user_value.size());
     }
     //return the record length
@@ -69,18 +70,18 @@ public:
         int offset=0;
         memcpy(&seq,buf+offset,8);
         offset+=8;
-        memcpy(&type,buf+offset,1);
-        offset+=1;
-        int32_t key_size ;
-        memcpy(&key_size,buf+offset,4);
-        offset+=4;
+        memcpy(&type,buf+offset,8);
+        offset+=8;
+        int64_t key_size ;
+        memcpy(&key_size,buf+offset,8);
+        offset+=8;
         char *key_buf = new char [key_size];
         memcpy(key_buf,buf+offset,key_size);
         offset+=key_size;
         user_key=Slice(key_buf,key_size);
-        int32_t value_size ;
-        memcpy(&value_size,buf+offset,4);
-        offset+=4;
+        int64_t value_size ;
+        memcpy(&value_size,buf+offset,8);
+        offset+=8;
         char *value_buf= new char [value_size];
         memcpy(value_buf,buf+offset,value_size);
         offset+=value_size;
