@@ -6,6 +6,7 @@
 #define KVENGINE_TABLE_H
 #include "env.h"
 #include "options.h"
+#include "status.h"
 //#include "iterator.h"
 #include "block.h"
 class Table{

@@ -49,10 +49,10 @@ Status Writer::EmitPhysicalRecord(RecordType t, const char *src, size_t length) 
     buffer[5] = static_cast<char>(length >> 8);
     buffer[6] = static_cast<char>(t);
 
-    Status s;
-    s = file_->Append(Slice(buffer, kHeaderSize));
-    if(s.ok()) s = file_->Append(Slice(src, length));
-    //if(s.ok()) s = file_->Flush();
-    block_offset += kHeaderSize + length;
-    return s;
+//    Status s;
+//    s = file_->Append(Slice(buffer, kHeaderSize));
+//    if(s.ok()) s = file_->Append(Slice(src, length));
+//    //if(s.ok()) s = file_->Flush();
+//    block_offset += kHeaderSize + length;
+//    return s;
 }

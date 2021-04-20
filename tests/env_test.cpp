@@ -7,13 +7,13 @@
 #include <iostream>
 
 TEST(envTest, Test1){
-    Env e;
-    std::string str("testDB");
-    Status s = e.CreateDir(str);
-    ASSERT_TRUE(s.ok());
-    str = "Makefile";
-    //s = e.FileExists(str);
-    //ASSERT_TRUE(s.ok());
+//    Env e;
+//    std::string str("testDB");
+//    Status s = e.CreateDir(str);
+//    ASSERT_TRUE(s.ok());
+//    str = "Makefile";
+//    //s = e.FileExists(str);
+//    //ASSERT_TRUE(s.ok());
 }
 
 TEST(envTest, TestFileStatus){
@@ -33,7 +33,25 @@ TEST(envTest, TestFileStatus){
 }
 
 TEST(envTest, TestWritableFile){
-    FileState* fs = new FileState;
-    WritableFile wf(fs);
-    //TODO: finish Flush() and test.
+    Env* e = new PosixEnv;
+    WritableFile* wf ;
+    e->NewWritableFile(std::string("TestFile1"), &wf);
+    wf->Append(Slice("testAppend"));
+    for(int i = 0 ; i < 1000; i++)
+    {
+        wf->Append(Slice("testData"+std::to_string(i)));
+    }
+    wf->Flush();
+    wf->Close();
+
+    RandomAccessFile* raf;
+    e->NewRandomAccessFile(std::string("TestFile1"), &raf);
+    Slice s;
+    char scratch[10];
+    raf->Read(0, 10, &s, scratch);
+    std::cout<<scratch<<std::endl;
+    ASSERT_TRUE(strcmp(scratch, "testAppend") == 0);
+    raf->Read(37, 9, &s, scratch);
+    std::cout<<s.data()<<std::endl;
+    ASSERT_TRUE(strcmp(scratch, "testData3") == 0);
 }

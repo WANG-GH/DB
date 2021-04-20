@@ -5,6 +5,7 @@
 #ifndef KVENGINE_LOG_WRITER_H
 #define KVENGINE_LOG_WRITER_H
 #include "env.h"
+#include "status.h"
 #include "dbformat.h"
 class Writer{
 public:

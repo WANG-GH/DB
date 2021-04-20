@@ -6,9 +6,10 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include "env.h"
 
-Status Env::CreateDir(std::string &dirname) {
+bool PosixEnv::CreateDir(std::string &dirname) {
     DIR* dir;
     dir = opendir(dirname.c_str());
     //TODO: return false when dir is exist
@@ -16,16 +17,16 @@ Status Env::CreateDir(std::string &dirname) {
     {
         std::string path = "./" + dirname;
         mkdir(path.c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRWXG | S_IRWXO);
-        return Status::OK();
+        return true;
     }
-    return Status::IOError("Dir exists");
+    return false;
 }
 
-Status Env::FileExists(std::string &fname) {
-    Status s;
+bool PosixEnv::FileExists(std::string &fname) {
+    bool s;
     if(access(fname.c_str(), F_OK) == 0)
-        return Status::OK();
-    return Status::IOError("FileExits");
+        return true;
+    return false;
 }
 
 void FileState::Ref() {
@@ -50,9 +51,9 @@ void FileState::Truncate() {
 }
 
 //scratch is the result.data().
-Status FileState::Read(uint64_t offset, size_t n, Slice *result, char *scratch) const {
+bool FileState::Read(uint64_t offset, size_t n, Slice *result, char *scratch) const {
     if (offset > size_) {
-        return Status::IOError("Offset greater than file size.");
+        return false;
     }
     //judge whether the n is at the end of file.
     const uint64_t available = size_ - offset;
@@ -61,7 +62,7 @@ Status FileState::Read(uint64_t offset, size_t n, Slice *result, char *scratch) 
     }
     if (n == 0) {
         *result = Slice();
-        return Status::OK();
+        return true;
     }
 
     //to find which the bock the offset is in and how many space the BlockOffset has.
@@ -86,10 +87,10 @@ Status FileState::Read(uint64_t offset, size_t n, Slice *result, char *scratch) 
     }
 
     *result = Slice(scratch, n);
-    return Status::OK();
+    return true;
 }
 
-Status FileState::Append(const Slice &data) {
+bool FileState::Append(const Slice &data) {
     const char* src = data.data();
     size_t src_len = data.size();
 
@@ -113,22 +114,123 @@ Status FileState::Append(const Slice &data) {
         size_ += avail;
     }
 
-    return Status::OK();
+    return true;
 }
 
 size_t FileState::DebugBlockSize() {
     return blocks_.size();
 }
 
-Status RandomAccessFile::Read(uint32_t offset, size_t n,
+bool MemRandomAccessFile::Read(uint32_t offset, size_t n,
                               Slice *result, char *scratch) const {
     return file_->Read(offset, n, result,scratch);
 }
 
-RandomAccessFile::~RandomAccessFile() {
+MemRandomAccessFile::~MemRandomAccessFile() {
     file_->Unref();
 }
 
-Status WritableFile::Append(const Slice &data) {
+bool MemWritableFile::Append(const Slice &data) {
     return file_->Append(data);
+}
+
+bool PosixWritableFile::Append(const Slice &data) {
+    size_t write_size = data.size();
+    const char* write_data = data.data();
+
+    size_t copy_size = std::min(write_size, kBufferSize - pos_);
+    std::memcpy(buf_ + pos_, write_data, copy_size);
+    write_data += copy_size;
+    write_size -= copy_size;
+    pos_ += copy_size;
+    if (write_size == 0) {
+        return true;
+    }
+
+    // Can't fit in buffer, so need to do at least one write.
+    bool status = FlushBuffer();
+    if (!status) {
+        return status;
+    }
+
+    // Small writes go to buffer, large writes are written directly.
+    if (write_size < kBufferSize) {
+        std::memcpy(buf_, write_data, write_size);
+        pos_ = write_size;
+        return true;
+    }
+    return WriteUnbuffered(write_data, write_size);
+}
+
+bool PosixWritableFile::WriteUnbuffered(const char *data, size_t size) {
+    while (size > 0) {
+        ssize_t write_result = ::write(fd_, data, size);
+        if (write_result < 0) {
+            if (errno == EINTR) {
+                continue;  // Retry
+            }
+            return false;
+        }
+        data += write_result;
+        size -= write_result;
+    }
+    return true;
+}
+
+bool PosixWritableFile::Flush() {
+    FlushBuffer();
+}
+
+bool PosixWritableFile::FlushBuffer() {
+    bool status = WriteUnbuffered(buf_, pos_);
+    pos_ = 0;
+    return status;
+}
+
+PosixWritableFile::~PosixWritableFile() {
+    if(fd_ > 0)
+    Close();
+}
+
+bool PosixWritableFile::Close() {
+    Flush();
+    close(fd_);
+    return true;
+}
+
+bool PosixEnv::NewWritableFile(const std::string &fname, WritableFile **result) {
+    int fd = open(fname.c_str(), O_TRUNC | O_WRONLY | O_CREAT, 0664);
+    *result = nullptr;
+    if(fd > 0)
+    {
+        *result = new PosixWritableFile(fd);
+        return true;
+    }
+    return false;
+}
+
+bool PosixEnv::NewRandomAccessFile(const std::string &fname, RandomAccessFile **result) {
+    int fd = open(fname.c_str(), O_RDONLY);
+    *result = nullptr;
+    if(fd > 0){
+        *result = new PosixRandomAccessFile(fd, fname);
+        return true;
+    }
+    return false;
+}
+
+bool PosixRandomAccessFile::Read(uint64_t offset, size_t n, Slice *result, char *scratch) const {
+    lseek(fd_, offset, SEEK_SET);
+    size_t length = read(fd_, scratch, n);
+    if(length > 0){
+        Slice* r = new Slice(scratch, n);
+        result = r;
+        return true;
+    }
+    result = nullptr;
+    return false;
+}
+
+PosixRandomAccessFile::~PosixRandomAccessFile() {
+    close(fd_);
 }
