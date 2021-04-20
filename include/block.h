@@ -11,70 +11,77 @@
 #include "slice.h"
 #include "coding.h"
 #include "iterator.h"
+
 class BlockIterator;
+
 class Block {
     friend class BlockIterator;
+
 public:
-    Block(Slice content){
-        int32_t counter=DecodeFixed32(content.data()+content.size()-4);
-        for (int32_t i = 0,pos=0; i <counter ; ++i) {
+    Block(Slice content) {
+        int32_t counter = DecodeFixed32(content.data() + content.size() - 4);
+        for (int32_t i = 0, pos = 0; i < counter; ++i) {
             InternalKey *item = new InternalKey();
-            pos+=item->DecodeFrom(content.data()+pos);
+            pos += item->DecodeFrom(content.data() + pos);
             items.push_back(item);
         }
     }
-    Iterator* NewIterator();
+
+    Iterator *NewIterator();
 
 private:
-    std::vector<InternalKey*> items;
+    std::vector<InternalKey *> items;
 };
-class BlockIterator:public Iterator{
+
+class BlockIterator : public Iterator {
 public:
-    BlockIterator(Block* block_){
-        block=block_;
+    BlockIterator(Block *block_) {
+        block = block_;
         id = 0;
     }
-    virtual ~BlockIterator(){
+
+    virtual ~BlockIterator() {
         delete block;
     }
-    InternalKey* internal_key(){
+
+    InternalKey *internal_key() {
         return block->items[id];
     }
-    bool Valid() const{
-        return (id>=0) && (id<block->items.size());
+
+    bool Valid() const {
+        return (id >= 0) && (id < block->items.size());
     }
 
     void SeekToFirst() {
-        id=0;
+        id = 0;
     }
 
     void SeekToLast() {
         id = block->items.size();
     }
+
     //binary search, find the key >= target
-    void Seek(const Slice& target) {
-        int left = 0,right=block->items.size()-1;
-        while (left<right){
-            int mid = left+right>>1;
-            if (block->items[mid]->user_key.compare(target) > 0){
-                right = mid-1;
-            }
-            else if(block->items[mid]->user_key.compare(target) < 0){
-                left = mid+1;
-            }
-            else{
+    void Seek(const Slice &target) {
+        int left = 0, right = block->items.size() - 1;
+        while (left < right) {
+            int mid = left + right >> 1;
+            if (block->items[mid]->user_key.compare(target) > 0) {
+                right = mid - 1;
+            } else if (block->items[mid]->user_key.compare(target) < 0) {
+                left = mid + 1;
+            } else {
                 id = mid;
-                return ;
+                return;
             }
         }
-        if (block->items[left]->user_key.compare(target)==0){
+        if (block->items[left]->user_key.compare(target) == 0) {
             id = left;
-            return ;
+            return;
         }
             //not found
-        else{
+        else {
             id = block->items.size();
-            return ;
+            return;
         }
     }
 
@@ -86,20 +93,21 @@ public:
         id--;
     }
 
-    Slice key()const{
+    Slice key() const {
         return block->items[id]->user_key;
     }
-    Slice value()const{
+
+    Slice value() const {
         return block->items[id]->user_value;
     }
 
 private:
-    Block * block;
+    Block *block;
     int id;
 };
 
 Iterator *Block::NewIterator() {
-    return new  BlockIterator(this);
+    return new BlockIterator(this);
 }
 
 

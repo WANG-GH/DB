@@ -6,8 +6,10 @@
 #define KVENGINE_CODING_H
 
 #include <cstdint>
+#include <cstring>
+#include <string>
 
-inline char* EncodeFixed32(char* dst, uint32_t value) {
+inline char *EncodeFixed32(char *dst, uint32_t value) {
     uint8_t* const buffer = reinterpret_cast<uint8_t*>(dst);
 
     // Recent clang and gcc optimize this to a single mov / str instruction.
@@ -18,7 +20,8 @@ inline char* EncodeFixed32(char* dst, uint32_t value) {
     return dst+4;
 }
 
-inline char* EncodeFixed64(char* dst, uint64_t value) {
+
+inline char *EncodeFixed64(char *dst, uint64_t value) {
     uint8_t* const buffer = reinterpret_cast<uint8_t*>(dst);
 
     // Recent clang and gcc optimize this to a single mov / str instruction.
@@ -33,7 +36,7 @@ inline char* EncodeFixed64(char* dst, uint64_t value) {
     return dst+8;
 }
 
-inline uint32_t DecodeFixed32(const char* ptr) {
+inline uint32_t DecodeFixed32(const char* ptr){
     const uint8_t* const buffer = reinterpret_cast<const uint8_t*>(ptr);
 
     // Recent clang and gcc optimize this to a single mov / ldr instruction.
@@ -43,7 +46,7 @@ inline uint32_t DecodeFixed32(const char* ptr) {
            (static_cast<uint32_t>(buffer[3]) << 24);
 }
 
-inline uint64_t DecodeFixed64(const char* ptr) {
+inline uint64_t DecodeFixed64(const char *ptr) {
     const uint8_t* const buffer = reinterpret_cast<const uint8_t*>(ptr);
 
     // Recent clang and gcc optimize this to a single mov / ldr instruction.
@@ -57,21 +60,16 @@ inline uint64_t DecodeFixed64(const char* ptr) {
            (static_cast<uint64_t>(buffer[7]) << 56);
 }
 
-//void PutFixed32(std::string* dst, uint32_t value) {
-//    char buf[sizeof(value)];
-//    EncodeFixed32(buf, value);
-//    dst->append(buf, sizeof(buf));
-//}
-//
-//void PutFixed64(std::string* dst, uint64_t value) {
-//    char buf[sizeof(value)];
-//    EncodeFixed64(buf, value);
-//    dst->append(buf, sizeof(buf));
-//}
 
-inline char* Copy(char*dst,const char *src,uint64_t len){
+
+void PutFixed32(std::string* dst, uint32_t value);
+
+void PutFixed64(std::string* dst, uint64_t value);
+
+inline char *Copy(char *dst, const char *src, uint64_t len) {
     memcpy(dst,src,len);
     return dst+len;
 }
+
 
 #endif //KVENGINE_CODING_H

@@ -26,9 +26,7 @@ class WritableFile;
 class TableBuilder {
 public:
 
-    TableBuilder(const Options &options,WritableFile* file ):
-        closed(false),offset(0),num_entries(0),pending_index_entry(false){
-    }
+    TableBuilder(const Options &options,WritableFile* file );
 
     TableBuilder(const TableBuilder &) = delete;
 
@@ -37,88 +35,135 @@ public:
     ~TableBuilder();
 
 
-    Status ChangeOptions(const Options &options);
 
-    void Add(InternalKey* internalKey){
-        if (status().ok()){
-            if (pending_index_entry){
-                index_block_builder.Add(pending_handle.internalKey);
-                pending_index_entry = false;
-            }
-        }
-        pending_handle.internalKey=internalKey;
-        num_entries++;
-        data_block_builder.Add(internalKey);
-        if(data_block_builder.CurrentSizeEstimate()> MAX_BLOCK_SIZE){
-            Flush();
-        }
-    }
+    void Add(InternalKey* );
 
 
-    void Flush(){
-        if (data_block_builder.IsEmpty()){
-            return ;
-        }
-        InternalKey* origin_key = pending_handle.internalKey;
-        pending_handle.internalKey = new InternalKey(origin_key->seq,origin_key->type,origin_key->user_key,"");
-        pending_handle.SetBlockHandle(WriteBlock(&data_block_builder));
-        pending_index_entry = true;
-    }
+    void Flush();
 
 
     Status status() const{
-        return s;
     }
 
 
-    void Finish(){
-        //write data block
-        Flush();
-
-        //write indexblock
-        if(pending_index_entry){
-            index_block_builder.Add(pending_handle.internalKey);
-            pending_index_entry = false;
-        }
-        Footer footer;
-        footer.index_handle() = WriteBlock(&index_block_builder);
-
-        //write footer
-        std::string footer_encoding;
-        footer.EncodeTo(&footer_encoding);
-        file->Append(footer_encoding);
-        file->Close();
-        return ;
-    }
+    void Finish();
 
 
 private:
-    bool ok() const { return status().ok(); }
 
-    BlockHandle WriteBlock(BlockBuilder *block) {
-        Slice content = block->Finish();
-        BlockHandle blockHandle;
-        blockHandle.offset_ = offset;
-        blockHandle.size_ = content.size();
-        offset+=blockHandle.size_;
-        s = file->Append(content);
-        file->Sync();
-        block->Reset();
-        return blockHandle;
-    }
 
+    void WriteBlock(BlockBuilder *block,BlockHandle *handle);
+    void WriteRawBlock(const Slice &block_contents, BlockHandle *handle);
+
+    struct Rep;
+    Rep* rep_;
+
+
+};
+struct TableBuilder::Rep {
+    Rep(const Options& opt, WritableFile* f)
+            : options(opt),
+              file(f),
+              offset(0),
+              num_entries(0),
+              closed(false),
+              pending_index_entry(false){}
     Options options;
-    Options index_block_options;
     WritableFile* file;
     uint64_t offset;
+    Status status;
     BlockBuilder data_block_builder;
     BlockBuilder index_block_builder;
-    std::string last_key;
+    //std::string last_key;
     int64_t num_entries;
     bool closed;  // Either Finish() or Abandon() has been called.
+
     bool pending_index_entry;
     IndexBlockHandle pending_handle;  // Handle to add to index block
-    Status s;
+
 };
+
+TableBuilder::TableBuilder(const Options &options, WritableFile *file)
+        :rep_(new Rep(options,file)){
+}
+
+TableBuilder::~TableBuilder() {
+    assert(rep_->closed);  // Catch errors where caller forgot to call Finish()
+    delete rep_;
+}
+
+void TableBuilder::Add(InternalKey* item) {
+    Rep* r = rep_;
+    assert(!r->closed);
+
+    if (r->num_entries > 0) {
+        //assert(r->options.comparator->Compare(key, Slice(r->last_key)) > 0);
+    }
+    if (r->pending_index_entry) {
+        assert(r->data_block_builder.IsEmpty());
+        r->index_block_builder.Add(rep_->pending_handle.internalKey);
+        r->pending_index_entry = false;
+    }
+    rep_->pending_handle.internalKey = item;
+
+    r->num_entries++;
+    r->data_block_builder.Add(item);
+    if(rep_->data_block_builder.CurrentSizeEstimate()> MAX_BLOCK_SIZE){
+        Flush();
+    }
+}
+
+void TableBuilder::Finish() {
+    //write data block
+    Flush();
+
+    //write indexblock
+    if(rep_->pending_index_entry){
+        rep_->index_block_builder.Add(rep_->pending_handle.internalKey);
+        rep_->pending_index_entry = false;
+    }
+    Footer footer;
+    BlockHandle handle ;
+    WriteBlock(&rep_->index_block_builder,&handle);
+    footer.set_index_handle(handle);
+    //write footer
+    std::string footer_encoding;
+    footer.EncodeTo(&footer_encoding);
+    rep_->file->Append(footer_encoding);
+    rep_->file->Close();
+    return ;
+}
+
+void TableBuilder::Flush() {
+    Rep* r = rep_;
+    assert(!r->closed);
+
+    if (r->data_block_builder.IsEmpty()) return;
+    assert(!r->pending_index_entry);
+    BlockHandle handle;
+    WriteBlock(&r->data_block_builder, &handle);
+    InternalKey* origin_key = r->pending_handle.internalKey;
+    r->pending_handle.internalKey = new InternalKey(origin_key->seq,origin_key->type,origin_key->user_key,"");
+    r->pending_handle.SetBlockHandle(handle);
+    r->pending_index_entry = true;
+
+}
+
+void TableBuilder::WriteBlock(BlockBuilder *block,BlockHandle* handle) {
+    // File format contains a sequence of blocks where each block has:
+    //    block_data: uint8[n]
+
+    Rep* r = rep_;
+    Slice raw = block->Finish();
+    WriteRawBlock(raw, handle);
+    block->Reset();
+}
+void TableBuilder::WriteRawBlock(const Slice& block_contents,BlockHandle* handle) {
+    Rep* r = rep_;
+    handle->set_offset(r->offset);
+    handle->set_size(block_contents.size());
+    r->status = r->file->Append(block_contents);
+    assert(r->status.ok());
+}
 
 #endif //KVENGINE_TABLE_BUILDER_H

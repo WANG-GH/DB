@@ -5,10 +5,9 @@
 #include <table.h>
 
 struct Table::Rep{
+    Options options;
     RandomAccessFile* file;
-    uint64_t file_size_;
     Block* index_block;
-    BlockHandle meta_index_handle;
 };
 
 
@@ -38,23 +37,21 @@ Status Table::Open(const Options &options, RandomAccessFile *file, uint64_t file
         rep->file = file;
         rep->index_block = index_block;
         *table = new Table(rep);
-        rep->meta_index_handle = footer.metaindex_handle();
     }
     return s;
 }
 
-Status Table::InternalGet(const Slice &key, void *arg, void (*handle_result)(void *, const Slice &, const Slice &)) {
+Status Table::InternalGet(const Slice &key,Slice * value) {
     Status s;
     Iterator* iiter = rep_->index_block->NewIterator();
     iiter->Seek(key);
     if (iiter->Valid()) {
         Slice handle_value = iiter->value();
-        Iterator* block_iter = BlockReader(this, options, iiter->value());
+        Iterator* block_iter = GetDataIter(handle_value);
         block_iter->Seek(key);
         if (block_iter->Valid()) {
-            (*handle_result)(arg, block_iter->key(), block_iter->value());
+            *value = block_iter->value();
         }
-        s = block_iter->status();
         delete block_iter;
     }
 
@@ -63,14 +60,41 @@ Status Table::InternalGet(const Slice &key, void *arg, void (*handle_result)(voi
 }
 
 Status Table::ReadBlock(RandomAccessFile *file, const Options &options, const BlockHandle &handle, Slice *result) {
-    size_t n = static_cast<size_t>(handle.size_);
+    size_t n = static_cast<size_t>(handle.size());
     char* buf = new char[n];
     Slice contents;
-    Status s = file->Read(handle.offset_, n , &contents, buf);
+    Status s = file->Read(handle.offset(), n , &contents, buf);
     if (!s.ok()) {
         delete[] buf;
         return s;
     }
     *result = contents;
+    return  Status();
+}
+
+Iterator *Table::NewIterator(const Options &options) {
+    return new TableIterator(this,options);
+}
+
+Iterator *Table::GetDataIter(Slice &index_value) {
+    Block* block = nullptr;
+    BlockHandle handle;
+    Slice input = index_value;
+    Status s = handle.DecodeFrom(&input);
+    Slice result;
+    s =ReadBlock(rep_->file, rep_->options,handle,&result);
+    if (s.ok()) {
+        block = new Block(result);
+    }
+    Iterator * iter = nullptr;
+    if (block!= nullptr){
+        iter = block->NewIterator();
+    }
+    return iter;
+}
+
+TableIterator::TableIterator(Table *table, const Options &options)
+        : options_(options),table_(table),data_iter_(nullptr){
+    index_iter_ = table_->rep_->index_block->NewIterator();
 }
 
