@@ -1,1 +1,0 @@
-/usr/bin/c++  -g  -rdynamic CMakeFiles/run_actual_tests.dir/testdemo.o  -o run_actual_tests  -L/mnt/d/home/workspace/kvengine/tests/cmake-build-debug/lib lib/libgtestd.a lib/libgtest_maind.a lib/libgtestd.a -lpthread 

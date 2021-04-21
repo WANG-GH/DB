@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/run_actual_tests.dir/test.cpp.o CMakeFiles/run_actual_tests.dir/mem_table_test.cpp.o CMakeFiles/run_actual_tests.dir/__/src/memtable.cpp.o CMakeFiles/run_actual_tests.dir/__/src/arena.cpp.o CMakeFiles/run_actual_tests.dir/block_test.cpp.o  -o run_actual_tests ../lib/libgtestd.a ../lib/libgtest_maind.a ../lib/libgtestd.a -lpthread 
