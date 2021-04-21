@@ -5,20 +5,30 @@
 #ifndef KVENGINE_ENV_H
 #define KVENGINE_ENV_H
 
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <string>
 #include <vector>
 #include "slice.h"
+
 class RandomAccessFile;
 class WritableFile;
 class FileState;
+class SequentialFile;
 class Env{
 public:
     virtual bool NewWritableFile(const std::string& fname,
                                  WritableFile** result) = 0;
     virtual bool NewRandomAccessFile(const std::string& fname,
-                                     RandomAccessFile** result) = 0;
+                               RandomAccessFile** result) = 0;
+    virtual bool NewSequentialFile(const std::string& f,
+                             SequentialFile** r) = 0;
     virtual bool CreateDir(std::string& dirname) = 0;
     virtual bool FileExists(std::string& fname) = 0;
+    virtual bool GetFileSize(std::string& fname, uint64_t* size) = 0;
 };
 
 class FileState{
@@ -39,6 +49,17 @@ private:
     int refs_;
     std::vector<char*> blocks_;
     uint64_t size_;
+};
+
+class SequentialFile {
+public:
+    SequentialFile() = default;
+    SequentialFile(const SequentialFile&) = delete;
+    SequentialFile& operator=(const SequentialFile&) = delete;
+
+    virtual ~SequentialFile() = default;
+    virtual bool Read(size_t n, Slice* result, char* scratch) = 0;
+    virtual bool Skip(uint64_t n) = 0;
 };
 
 class RandomAccessFile{
@@ -95,6 +116,8 @@ class MemEnv : public Env{
                              RandomAccessFile** result) override{return true;};
     bool CreateDir(std::string& dirname)  override{return true;};
     bool FileExists(std::string& fname) override{return true;};
+    bool NewSequentialFile(const std::string& f, SequentialFile** r) override {return true;}
+//    bool GetFileSize(std::string& fname) override {return true;};
 };
 
 class PosixEnv : public Env{
@@ -104,6 +127,8 @@ class PosixEnv : public Env{
                              RandomAccessFile** result) override;
     bool CreateDir(std::string& dirname)  override;
     bool FileExists(std::string& fname) override;
+    bool NewSequentialFile(const std::string& f, SequentialFile** r) override;
+    bool GetFileSize(std::string& fname, uint64_t* size) override{return true;};
 };
 
 const int kBufferSize = 1024*64;
@@ -122,6 +147,20 @@ private:
     std::string dirname_;
     size_t pos_;
     char buf_[kBufferSize];
+};
+
+class PosixSequentialFile: public SequentialFile{
+public:
+    PosixSequentialFile(std::string filename, int fd)
+            : fd_(fd), filename_(filename) {}
+    ~PosixSequentialFile() override { close(fd_); }
+
+    bool Read(size_t n, Slice* result, char* scratch) override ;
+
+    bool Skip(uint64_t n) override;
+private:
+    const int fd_;
+    const std::string filename_;
 };
 
 class PosixRandomAccessFile: public RandomAccessFile{
