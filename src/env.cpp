@@ -204,6 +204,8 @@ bool PosixEnv::NewWritableFile(const std::string &fname, WritableFile **result) 
     return false;
 }
 
+//bool PosixEnv::GetFileSize(std::)
+
 bool PosixEnv::NewRandomAccessFile(const std::string &fname, RandomAccessFile **result) {
     int fd = open(fname.c_str(), O_RDONLY);
     *result = nullptr;

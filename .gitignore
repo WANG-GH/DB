@@ -78,6 +78,4 @@ fabric.properties
 
 tests/cmake-build-debug
 tests/googletest
-tests/CMakeLists.txt
-CMakeLists.txt
 cmake-build-debug

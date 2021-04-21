@@ -28,6 +28,7 @@ public:
                              SequentialFile** r) = 0;
     virtual bool CreateDir(std::string& dirname) = 0;
     virtual bool FileExists(std::string& fname) = 0;
+    virtual bool GetFileSize(std::string& fname, uint64_t* size) = 0;
 };
 
 class FileState{
@@ -116,6 +117,7 @@ class MemEnv : public Env{
     bool CreateDir(std::string& dirname)  override{return true;};
     bool FileExists(std::string& fname) override{return true;};
     bool NewSequentialFile(const std::string& f, SequentialFile** r) override {return true;}
+//    bool GetFileSize(std::string& fname) override {return true;};
 };
 
 class PosixEnv : public Env{
@@ -126,6 +128,7 @@ class PosixEnv : public Env{
     bool CreateDir(std::string& dirname)  override;
     bool FileExists(std::string& fname) override;
     bool NewSequentialFile(const std::string& f, SequentialFile** r) override;
+    bool GetFileSize(std::string& fname, uint64_t* size) override{return true;};
 };
 
 const int kBufferSize = 1024*64;
