@@ -2,11 +2,6 @@
 // Created by yeye on 2021/4/13.
 //
 
-#include <unistd.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "env.h"
 
 bool PosixEnv::CreateDir(std::string &dirname) {
@@ -178,7 +173,7 @@ bool PosixWritableFile::WriteUnbuffered(const char *data, size_t size) {
 }
 
 bool PosixWritableFile::Flush() {
-    FlushBuffer();
+    return FlushBuffer();
 }
 
 bool PosixWritableFile::FlushBuffer() {
@@ -219,12 +214,20 @@ bool PosixEnv::NewRandomAccessFile(const std::string &fname, RandomAccessFile **
     return false;
 }
 
+bool PosixEnv::NewSequentialFile(const std::string &f, SequentialFile **r) {
+    int fd = open(f.c_str(), O_RDONLY);
+    if(fd > 0){
+        *r = new PosixSequentialFile(f, fd);
+        return true;
+    }
+    return false;
+}
+
 bool PosixRandomAccessFile::Read(uint64_t offset, size_t n, Slice *result, char *scratch) const {
     lseek(fd_, offset, SEEK_SET);
     size_t length = read(fd_, scratch, n);
     if(length > 0){
-        Slice* r = new Slice(scratch, n);
-        result = r;
+        *result = Slice(scratch, n);
         return true;
     }
     result = nullptr;
@@ -233,4 +236,28 @@ bool PosixRandomAccessFile::Read(uint64_t offset, size_t n, Slice *result, char 
 
 PosixRandomAccessFile::~PosixRandomAccessFile() {
     close(fd_);
+}
+
+bool PosixSequentialFile::Read(size_t n, Slice *result, char *scratch) {
+    bool status;
+    while (true) {
+        ssize_t read_size = ::read(fd_, scratch, n);
+        if (read_size < 0) {  // Read error.
+            if (errno == EINTR) {
+                continue;  // Retry
+            }
+            status = false;
+            break;
+        }
+        *result = Slice(scratch, read_size);
+        break;
+    }
+    return status;
+}
+
+bool PosixSequentialFile::Skip(uint64_t n) {
+    if (lseek(fd_, n, SEEK_CUR) == static_cast<off_t>(-1)) {
+        return false;
+    }
+    return true;
 }
