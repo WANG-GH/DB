@@ -58,7 +58,7 @@ public:
 
     // Returns an estimate of the number of bytes of data in use by this
     // data structure. It is safe to call when MemTable is being modified.
-    inline size_t ApproximateMemoryUsage(){
+    inline     uint64_t ApproximateMemoryUsage(){
         return memoryUsage_;
     }
 

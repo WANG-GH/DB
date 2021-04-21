@@ -21,7 +21,7 @@ class SequentialFile;
 class Env{
 public:
     virtual bool NewWritableFile(const std::string& fname,
-                                   WritableFile** result) = 0;
+                                 WritableFile** result) = 0;
     virtual bool NewRandomAccessFile(const std::string& fname,
                                RandomAccessFile** result) = 0;
     virtual bool NewSequentialFile(const std::string& f,
@@ -70,7 +70,7 @@ public:
     virtual ~RandomAccessFile() = default;
 
     virtual bool Read(uint64_t offset, size_t n, Slice* result,
-                        char* scratch) const = 0;
+                      char* scratch) const = 0;
 };
 
 class MemRandomAccessFile: public RandomAccessFile{
@@ -79,7 +79,7 @@ public:
     ~MemRandomAccessFile() override;
 
     bool Read(uint32_t offset, size_t n, Slice* result,
-                char* scratch) const ;
+              char* scratch) const ;
 private:
     FileState* file_;
 };
@@ -111,9 +111,9 @@ private:
 
 class MemEnv : public Env{
     bool NewWritableFile(const std::string& fname,
-                                   WritableFile** result) override{return true;};
+                         WritableFile** result) override{return true;};
     bool NewRandomAccessFile(const std::string& fname,
-                                       RandomAccessFile** result) override{return true;};
+                             RandomAccessFile** result) override{return true;};
     bool CreateDir(std::string& dirname)  override{return true;};
     bool FileExists(std::string& fname) override{return true;};
     bool NewSequentialFile(const std::string& f, SequentialFile** r) override {return true;}
@@ -122,9 +122,9 @@ class MemEnv : public Env{
 
 class PosixEnv : public Env{
     bool NewWritableFile(const std::string& fname,
-                           WritableFile** result) override;
+                         WritableFile** result) override;
     bool NewRandomAccessFile(const std::string& fname,
-                               RandomAccessFile** result) override;
+                             RandomAccessFile** result) override;
     bool CreateDir(std::string& dirname)  override;
     bool FileExists(std::string& fname) override;
     bool NewSequentialFile(const std::string& f, SequentialFile** r) override;
@@ -169,7 +169,7 @@ public:
     ~PosixRandomAccessFile();
 
     bool Read(uint64_t offset, size_t n, Slice* result,
-                      char* scratch) const;
+              char* scratch) const;
 
 private:
     const int fd_;
