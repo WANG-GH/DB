@@ -26,6 +26,7 @@ public:
                                      RandomAccessFile** result) = 0;
     virtual bool NewSequentialFile(const std::string& f,
                                    SequentialFile** r) = 0;
+
     virtual bool CreateDir(std::string& dirname) = 0;
     virtual bool FileExists(std::string& fname) = 0;
     virtual bool GetFileSize(std::string& fname, uint64_t* size) = 0;

@@ -49,9 +49,9 @@ TEST(envTest, TestWritableFile){
     Slice s;
     char scratch[10];
     raf->Read(0, 10, &s, scratch);
-    std::cout<<scratch<<std::endl;
     ASSERT_TRUE(strcmp(scratch, "testAppend") == 0);
-    raf->Read(37, 9, &s, scratch);
-    std::cout<<s.data()<<std::endl;
-    ASSERT_TRUE(strcmp(scratch, "testData3") == 0);
+    char scratch2[9];
+    raf->Read(37, 9, &s, scratch2);
+    ASSERT_TRUE(strncmp(scratch2, "testData3", 9) == 0);
+    ASSERT_TRUE(strncmp("testData3", s.data(), 9) == 0);
 }

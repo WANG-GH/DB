@@ -12,6 +12,12 @@
 #include "version_edit.h"
 #include "status.h"
 #include "table_cache.h"
+enum{
+    kComparator = 1,
+    kLogNumber = 2,
+    kNewFile = 3,
+    kDeleteFile = 4
+};
 class Version{
 public:
     // Lookup the value for key.  If found, store it in *val and
@@ -67,6 +73,14 @@ private:
     void Finalize(Version* v);
     TableCache* table_;
 };
+
+void VersionEdit::EncodeTo(std::string *dst) const {
+    for(int i = 0; i < new_files_.size(); i++)
+    {
+        const FileMetaData& f = new_files_[i].second;
+        
+    }
+}
 
 
 #endif //KVENGINE_VERSION_SET_H
