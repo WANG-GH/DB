@@ -38,9 +38,7 @@ namespace config {
 
 typedef uint64_t SequenceNumber;
 enum ValueType { kTypeDeletion = 0x0, kTypeValue = 0x1 };
-class LookupKey{
 
-};
 struct ParsedInternalKey {
     Slice user_key;
     SequenceNumber sequence{};
@@ -59,24 +57,6 @@ inline Slice ExtractUserKey(const Slice& internal_key) {
     return Slice(internal_key.data(), internal_key.size() - 8);
 }
 
-// A comparator for internal keys that uses a specified comparator for
-// the user key portion and breaks ties by decreasing sequence number.
-//class InternalKeyComparator : public Comparator {
-//private:
-//    const Comparator* user_comparator_;
-//
-//public:
-//    explicit InternalKeyComparator(const Comparator* c) : user_comparator_(c) {}
-//    const char* Name() const override;
-//    int Compare(const Slice& a, const Slice& b) const override;
-//    void FindShortestSeparator(std::string* start,
-//                               const Slice& limit) const override;
-//    void FindShortSuccessor(std::string* key) const override;
-//
-//    const Comparator* user_comparator() const { return user_comparator_; }
-//
-//    int Compare(const InternalKey& a, const InternalKey& b) const;
-//};
 
 
 static const SequenceNumber kMaxSequenceNumber = ((0x1ull << 56) - 1);
@@ -117,28 +97,96 @@ public:
 
 };
 
-//class InternalKeyComparator : public Comparator {
-//public:
-//    const char* Name() const override{
-//        return NULL;
-//    }
-//    int Compare(const Slice& a, const Slice& b) const override{
-//        return 0;
-//    }
-//    void FindShortestSeparator(std::string* start,
-//                               const Slice& limit) const override{
-//    }
-//    void FindShortSuccessor(std::string* key) const override{
-//    }
-//    //以上方法是因为从虚基类 Comparator 继承需要实现
-//    int Compare(const InternalKey& a, const InternalKey& b) const{
-//        int r =a.user_key.compare(b.user_key);
-//        if (r!=0){
-//            return r;
-//        }
-//        return a.seq > b.seq ? -1:1;
-//    }
-//};
+class InternalKeyComparator : public Comparator {
+public:
+    explicit InternalKeyComparator(const Comparator* c) : user_comparator_(c) {}
+    const char* Name() const override{
+        return "leveldb.InternalKeyComparator";
+    }
+    int Compare(const Slice& akey, const Slice& bkey) const override{
+        // Order by:
+        //    increasing user key (according to user-supplied comparator)
+        //    decreasing sequence number
+        //    decreasing type (though sequence# should be enough to disambiguate)
+        int r = user_comparator_->Compare(ExtractUserKey(akey), ExtractUserKey(bkey));
+        if (r == 0) {
+            const uint64_t anum = DecodeFixed64(akey.data() + akey.size() - 8);
+            const uint64_t bnum = DecodeFixed64(bkey.data() + bkey.size() - 8);
+            if (anum > bnum) {
+                r = -1;
+            } else if (anum < bnum) {
+                r = +1;
+            }
+        }
+        return r;
+    }
+    void FindShortestSeparator(std::string* start,
+                               const Slice& limit) const override{
+    }
+    void FindShortSuccessor(std::string* key) const override{
+    }
+    const Comparator* user_comparator() const { return user_comparator_; }
+    //以上方法是因为从虚基类 Comparator 继承需要实现
+    int Compare(const InternalKey& a, const InternalKey& b) const{
+        return Compare(a.Encode(),b.Encode());
+    }
+private:
+    const Comparator* user_comparator_;
+};
+class LookupKey {
+public:
+    // Initialize *this for looking up user_key at a snapshot with
+    // the specified sequence number.
+    LookupKey(const Slice& user_key, SequenceNumber sequence){
+        size_t usize = user_key.size();
+        size_t needed = usize + 13;  // A conservative estimate
+        char* dst;
+        if (needed <= sizeof(space_)) {
+            dst = space_;
+        } else {
+            dst = new char[needed];
+        }
+        start_ = dst;
+        dst = EncodeFixed32(dst, usize + 8);         // usize + 8 = internal_key_size
+        kstart_ = dst;
+        std::memcpy(dst, user_key.data(), usize);
+        dst += usize;
+        EncodeFixed64(dst, PackSequenceAndType(sequence, kValueTypeForSeek));
+        dst += 8;
+        end_ = dst;
+    }
+
+    LookupKey(const LookupKey&) = delete;
+    LookupKey& operator=(const LookupKey&) = delete;
+
+    ~LookupKey();
+
+    // Return a key suitable for lookup in a MemTable.
+    Slice memtable_key() const { return Slice(start_, end_ - start_); }
+
+    // Return an internal key (suitable for passing to an internal iterator)
+    Slice internal_key() const { return Slice(kstart_, end_ - kstart_); }
+
+    // Return the user key
+    Slice user_key() const { return Slice(kstart_, end_ - kstart_ - 8); }
+
+private:
+    // We construct a char array of the form:
+    //    klength  varint32               <-- start_
+    //    userkey  char[klength]          <-- kstart_
+    //    tag      uint64
+    //                                    <-- end_
+    // The array is a suitable MemTable key.
+    // The suffix starting with "userkey" can be used as an InternalKey.
+    const char* start_;
+    const char* kstart_;
+    const char* end_;
+    char space_[200];  // Avoid allocation for short keys
+
+};
+inline LookupKey::~LookupKey() {
+    if (start_ != space_) delete[] start_;
+}
 
 enum RecordType {
     // Zero is reserved for preallocated files
