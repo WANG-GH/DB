@@ -84,31 +84,3 @@ TEST(MEMTABLE_TEST, TEST_1) {
         ASSERT_EQ(value, "value" + std::to_string(i));
     }
 }
-
-#if 0
-TEST(SKIPLIST_TEST,TEST_GET_SIZE){
-    SkipList * memtable;
-    memtable = new SkipList(6,"");
-    int size = 0;
-    for (int i = 0; i < 100; ++i) {
-        std::string key("key"+std::to_string(i));
-        std::string val("val"+ std::to_string(i));
-        memtable->insert(key,val);
-        size+=key.size()+val.size();
-    }
-    ASSERT_EQ(size,memtable->getSize());
-}
-TEST(SKIPLIST_TEST,TEST_INSERT_FIND){
-    SkipList * memtable;
-    memtable = new SkipList(6,"");
-    for (int i = 0; i < 100; ++i) {
-        std::string key("key"+std::to_string(i));
-        std::string val("val"+ std::to_string(i));
-        memtable->insert(key,val);
-    }
-    for (int i = 0; i < 100; ++i) {
-        ASSERT_EQ(memtable->find("key"+std::to_string(i))->value,std::string("val"+std::to_string(i)));
-    }
-
-}
-#endif

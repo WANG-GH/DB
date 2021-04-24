@@ -15,7 +15,7 @@
 #include "env.h"
 #include "iterator.h"
 
-const int  MAX_BLOCK_SIZE = 4 * 1024;
+
 
 class BlockBuilder;
 
@@ -34,7 +34,7 @@ public:
 
     ~TableBuilder();
 
-    void Add(InternalKey* );
+    void Add(const Slice& key, const Slice& value);
 
     void Flush();
 
@@ -67,12 +67,13 @@ struct TableBuilder::Rep {
     Status status;
     BlockBuilder data_block_builder;
     BlockBuilder index_block_builder;
-    //std::string last_key;
+    std::string last_key;
     int64_t num_entries;
     bool closed;  // Either Finish() or Abandon() has been called.
 
+    // Invariant: r->pending_index_entry is true only if data_block is empty.
     bool pending_index_entry;
-    IndexBlockHandle pending_handle;  // Handle to add to index block
+    BlockHandle pending_handle;  // Handle to add to index block
 
 };
 
@@ -85,80 +86,81 @@ TableBuilder::~TableBuilder() {
     delete rep_;
 }
 
-void TableBuilder::Add(InternalKey* item) {
+void TableBuilder:: Add(const Slice& key, const Slice& value){
     Rep* r = rep_;
     assert(!r->closed);
-
     if (r->num_entries > 0) {
-        //assert(r->options.comparator->Compare(key, Slice(r->last_key)) > 0);
+        assert(r->options.comparator->Compare(key, Slice(r->last_key)) > 0);
     }
     if (r->pending_index_entry) {
         assert(r->data_block_builder.IsEmpty());
-        r->index_block_builder.Add(rep_->pending_handle.internalKey);
+        r->options.comparator->FindShortestSeparator(&r->last_key, key);
+        std::string handle_encoding;
+        r->pending_handle.EncodeTo(&handle_encoding);
+        r->index_block_builder.Add(r->last_key, Slice(handle_encoding));
         r->pending_index_entry = false;
     }
-    rep_->pending_handle.internalKey = item;
 
+    r->last_key.assign(key.data(), key.size());
     r->num_entries++;
-    r->data_block_builder.Add(item);
-    if(rep_->data_block_builder.CurrentSizeEstimate()> MAX_BLOCK_SIZE){
+    r->data_block_builder.Add(key,value);
+    if(r->data_block_builder.CurrentSizeEstimate()> r->options.block_size){
         Flush();
     }
 }
 
 void TableBuilder::Finish() {
     Rep* r = rep_;
-    //write data block
+    //write remaining data block
     Flush();
     assert(!r->closed);
     r->closed = true;
 
+    BlockHandle index_block_handle;
     //write indexblock
     if(rep_->pending_index_entry){
-        rep_->index_block_builder.Add(rep_->pending_handle.internalKey);
-        rep_->pending_index_entry = false;
+        r->options.comparator->FindShortSuccessor(&r->last_key);
+        std::string handle_encoding;
+        r->pending_handle.EncodeTo(&handle_encoding);
+        r->index_block_builder.Add(r->last_key, Slice(handle_encoding));
+        r->pending_index_entry = false;
     }
+    WriteBlock(&r->index_block_builder, &index_block_handle);
+
+    // Write footer
     Footer footer;
-    BlockHandle handle ;
-    WriteBlock(&rep_->index_block_builder,&handle);
-    footer.set_index_handle(handle);
-    //write footer
+    footer.set_index_handle(index_block_handle);
     std::string footer_encoding;
     footer.EncodeTo(&footer_encoding);
-    rep_->file->Append(footer_encoding);
-    rep_->file->Close();
-    rep_->offset+=footer_encoding.size();
-    return ;
+    bool ret = r->file->Append(footer_encoding);
+    if (ret)
+    {
+        r->offset+=footer_encoding.size();
+    }
+    r->file->Close();
 }
 
 void TableBuilder::Flush() {
     Rep* r = rep_;
     assert(!r->closed);
-
     if (r->data_block_builder.IsEmpty()) return;
     assert(!r->pending_index_entry);
-    BlockHandle handle;
-    WriteBlock(&r->data_block_builder, &handle);
-    InternalKey* origin_key = r->pending_handle.internalKey;
-    r->pending_handle.internalKey = new InternalKey(origin_key->seq,origin_key->type,origin_key->user_key,"");
-    r->pending_handle.SetBlockHandle(handle);
+    WriteBlock(&r->data_block_builder, &r->pending_handle);
     r->pending_index_entry = true;
-
+    r->file->Flush();
 }
 
-void TableBuilder::WriteBlock(BlockBuilder *block,BlockHandle* handle) {
-    // File format contains a sequence of blocks where each block has:
-    //    block_data: uint8[n]
+void TableBuilder::WriteBlock(BlockBuilder *block_builder,BlockHandle* handle) {
 
     Rep* r = rep_;
-    Slice raw = block->Finish();
+    Slice raw = block_builder->Finish();
     WriteRawBlock(raw, handle);
-    block->Reset();
+    block_builder->Reset();
 }
 void TableBuilder::WriteRawBlock(const Slice& block_contents,BlockHandle* handle) {
     Rep* r = rep_;
     handle->set_offset(r->offset);
-    handle->set_size(block_contents.size());
+    handle->set_length(block_contents.size());
     bool ret = r->file->Append(block_contents);
     r->offset+= block_contents.size();
     assert(ret);

@@ -4,7 +4,6 @@
 
 #ifndef KVENGINE_TABLE_H
 #define KVENGINE_TABLE_H
-#include "env.h"
 #include "options.h"
 
 #include "status.h"
@@ -14,18 +13,18 @@
 #include "env.h"
 #include "iterator.h"
 
-
+Status ReadBlock(RandomAccessFile *file, const Options &options,
+                 const BlockHandle &handle, Slice *result);
 class TableIterator;
 class Table{
     friend TableIterator;
 public:
     static Status Open(const Options& options, RandomAccessFile* file,
                        uint64_t file_size, Table** table) ;
-    static Status ReadBlock(RandomAccessFile *file, const Options &options,
-                            const BlockHandle &handle, Slice *result);
+
     Table(const Table&) = delete;
     Table& operator=(const Table&) = delete;
-    Iterator* NewIterator(const Options&) ;
+    Iterator* NewIterator() ;
     Iterator *GetDataIter(Slice& index_value);
 
 private:
@@ -38,7 +37,7 @@ private:
 };
 class TableIterator: public Iterator{
 public:
-   TableIterator (Table* table,const Options& options);
+   TableIterator (Table* table);
     ~TableIterator () = default;
     virtual bool Valid() const {
         return  data_iter_ != nullptr &&  data_iter_ ->Valid();
@@ -91,7 +90,6 @@ private:
     Iterator* index_iter_;
     Iterator*  data_iter_;  // May be nullptr
     std::string data_block_handle_;
-    const Options options_;
 
     void SkipEmptyDataBlocksForward(){
         while (data_iter_ == nullptr || !data_iter_->Valid()) {
@@ -117,7 +115,6 @@ private:
             if (data_iter_!= nullptr) data_iter_->SeekToLast();
         }
     }
-
     void InitDataBlock() {
         if (!index_iter_->Valid()) {
             data_iter_ = nullptr;

@@ -220,6 +220,10 @@ bool PosixEnv::NewRandomAccessFile(const std::string &fname, RandomAccessFile **
     return false;
 }
 
+bool PosixEnv::NewSequentialFile(const std::string &f, SequentialFile **r) {
+    return false;
+}
+
 bool PosixRandomAccessFile::Read(uint64_t offset, size_t n, Slice *result, char *scratch) const {
     lseek(fd_, offset, SEEK_SET);
     size_t length = read(fd_, scratch, n);
