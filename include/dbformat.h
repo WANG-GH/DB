@@ -7,6 +7,7 @@
 #include <cstdint>
 #include "slice.h"
 #include "comparator.h"
+#include "coding.h"
 
 //this file include dbformat and log_writer format
 
@@ -40,85 +41,104 @@ enum ValueType { kTypeDeletion = 0x0, kTypeValue = 0x1 };
 class LookupKey{
 
 };
-
-class InternalKey{
-
-public:
-    InternalKey(){}
-    InternalKey(SequenceNumber seq_,ValueType type_,
-                const Slice key_,const Slice value_):
-            seq(seq_),type(type_),user_key(key_),user_value(value_){}
-    void EncodeTo(std::string *dst){
-        char  buf[8];
-        memset(buf,0,sizeof(buf));
-        memcpy(buf,&seq,8);
-        dst->append(buf,8);
-        memset(buf,0,sizeof(buf));
-        memcpy(buf,&type,8);
-        dst->append(buf,8);
-        int64_t key_size = user_key.size();
-        memcpy(buf,&key_size,8);
-        dst->append(buf,8);
-        dst->append(user_key.data(),user_key.size());
-        int64_t value_size = user_value.size();
-        memcpy(buf,&value_size,8);
-        dst->append(buf,8);
-        dst->append(user_value.data(),user_value.size());
-    }
-    //return the record length
-    int64_t DecodeFrom(const char *buf){
-        int offset=0;
-        memcpy(&seq,buf+offset,8);
-        offset+=8;
-        memcpy(&type,buf+offset,8);
-        offset+=8;
-        int64_t key_size ;
-        memcpy(&key_size,buf+offset,8);
-        offset+=8;
-        char *key_buf = new char [key_size];
-        memcpy(key_buf,buf+offset,key_size);
-        offset+=key_size;
-        user_key=Slice(key_buf,key_size);
-        int64_t value_size ;
-        memcpy(&value_size,buf+offset,8);
-        offset+=8;
-        char *value_buf= new char [value_size];
-        memcpy(value_buf,buf+offset,value_size);
-        offset+=value_size;
-        user_value=Slice(value_buf,value_size);
-        return offset;
-    }
-    //all are public
-public:
-    SequenceNumber seq;
-    ValueType type;
+struct ParsedInternalKey {
     Slice user_key;
-    Slice user_value;
+    SequenceNumber sequence{};
+    ValueType type;
+
+    ParsedInternalKey() = default;  // Intentionally left uninitialized (for speed)
+    ParsedInternalKey(const Slice& u, const SequenceNumber& seq, ValueType t)
+            : user_key(u), sequence(seq), type(t) {}
 
 };
+bool ParseInternalKey(const Slice& internal_key, ParsedInternalKey* result);
 
-class InternalKeyComparator : public Comparator {
+// Returns the user key portion of an internal key.
+inline Slice ExtractUserKey(const Slice& internal_key) {
+    assert(internal_key.size() >= 8);
+    return Slice(internal_key.data(), internal_key.size() - 8);
+}
+
+// A comparator for internal keys that uses a specified comparator for
+// the user key portion and breaks ties by decreasing sequence number.
+//class InternalKeyComparator : public Comparator {
+//private:
+//    const Comparator* user_comparator_;
+//
+//public:
+//    explicit InternalKeyComparator(const Comparator* c) : user_comparator_(c) {}
+//    const char* Name() const override;
+//    int Compare(const Slice& a, const Slice& b) const override;
+//    void FindShortestSeparator(std::string* start,
+//                               const Slice& limit) const override;
+//    void FindShortSuccessor(std::string* key) const override;
+//
+//    const Comparator* user_comparator() const { return user_comparator_; }
+//
+//    int Compare(const InternalKey& a, const InternalKey& b) const;
+//};
+
+
+static const SequenceNumber kMaxSequenceNumber = ((0x1ull << 56) - 1);
+static const ValueType kValueTypeForSeek = kTypeValue;
+static uint64_t PackSequenceAndType(uint64_t seq, ValueType t) {
+    assert(seq <= kMaxSequenceNumber);
+    assert(t <= kValueTypeForSeek);
+    return (seq << 8) | t;
+}
+void AppendInternalKey(std::string* result, const ParsedInternalKey& key);
+class InternalKey {
+private:
+    std::string rep_;
+
 public:
-    const char* Name() const override{
-        return NULL;
+    InternalKey() = default;  // Leave rep_ as empty to indicate it is invalid
+    InternalKey(const Slice& user_key, SequenceNumber s, ValueType t) {
+        AppendInternalKey(&rep_, ParsedInternalKey(user_key, s, t));
     }
-    int Compare(const Slice& a, const Slice& b) const override{
-        return 0;
+
+    bool DecodeFrom(const Slice& s) {
+        rep_.assign(s.data(), s.size());
+        return !rep_.empty();
     }
-    void FindShortestSeparator(std::string* start,
-                               const Slice& limit) const override{
+
+    Slice Encode() const {
+        assert(!rep_.empty());
+        return rep_;
     }
-    void FindShortSuccessor(std::string* key) const override{
+
+    Slice user_key() const { return ExtractUserKey(rep_); }
+
+    void SetFrom(const ParsedInternalKey& p) {
+        rep_.clear();
+        AppendInternalKey(&rep_, p);
     }
-    //以上方法是因为从虚基类 Comparator 继承需要实现
-    int Compare(const InternalKey& a, const InternalKey& b) const{
-        int r =a.user_key.compare(b.user_key);
-        if (r!=0){
-            return r;
-        }
-        return a.seq > b.seq ? -1:1;
-    }
+    void Clear() { rep_.clear(); }
+
 };
+
+//class InternalKeyComparator : public Comparator {
+//public:
+//    const char* Name() const override{
+//        return NULL;
+//    }
+//    int Compare(const Slice& a, const Slice& b) const override{
+//        return 0;
+//    }
+//    void FindShortestSeparator(std::string* start,
+//                               const Slice& limit) const override{
+//    }
+//    void FindShortSuccessor(std::string* key) const override{
+//    }
+//    //以上方法是因为从虚基类 Comparator 继承需要实现
+//    int Compare(const InternalKey& a, const InternalKey& b) const{
+//        int r =a.user_key.compare(b.user_key);
+//        if (r!=0){
+//            return r;
+//        }
+//        return a.seq > b.seq ? -1:1;
+//    }
+//};
 
 enum RecordType {
     // Zero is reserved for preallocated files

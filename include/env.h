@@ -107,7 +107,7 @@ class PosixEnv : public Env{
 };
 
 const int kBufferSize = 1024*64;
-class PosixWritableFile: public WritableFile{
+class PosixWritableFile: public WritableFle{
 public:
     PosixWritableFile(int fd): fd_(fd){}
     ~PosixWritableFile();

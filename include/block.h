@@ -11,6 +11,7 @@
 #include "slice.h"
 #include "coding.h"
 #include "iterator.h"
+#include "block_builder.h"
 
 class BlockIterator;
 
@@ -19,91 +20,113 @@ class Block {
 
 public:
     Block(Slice content) {
-        int32_t counter = DecodeFixed32(content.data() + content.size() - 4);
-        for (int32_t i = 0, pos = 0; i < counter; ++i) {
-            InternalKey *item = new InternalKey();
-            pos += item->DecodeFrom(content.data() + pos);
-            items.push_back(item);
-        }
+        buffer_ = content.data();
+        length = content.size();
     }
-
+    inline uint64_t GetSlotsNum(){
+        return DecodeFixed64(buffer_+length-sizeof(uint64_t));
+    }
+    inline const Slot* GetSlotsStartPointer(){
+        return reinterpret_cast<const Slot*>(buffer_ + length - sizeof(uint64_t) - GetSlotsNum()*sizeof(Slot));
+    }
     Iterator *NewIterator();
 
-
 private:
-    std::vector<InternalKey *> items;
+    const char * buffer_;
+    size_t length;
 };
 
 class BlockIterator : public Iterator {
 public:
-    BlockIterator(Block *block_) {
+    explicit BlockIterator(Block *block_) {
         block = block_;
         id = 0;
+        slots = block->GetSlotsStartPointer();
     }
 
-    virtual ~BlockIterator() {
+    ~BlockIterator() override {
         delete block;
     }
 
-    InternalKey *internal_key() {
-        return block->items[id];
+    bool Valid() const override {
+        return (id >= 0) && (id <block->GetSlotsNum());
     }
 
-    bool Valid() const {
-        return (id >= 0) && (id < block->items.size());
-    }
-
-    void SeekToFirst() {
+    void SeekToFirst() override {
         id = 0;
     }
 
-    void SeekToLast() {
-        id = block->items.size();
+    void SeekToLast() override {
+        id = block->GetSlotsNum()-1;
     }
 
     //binary search, find the key >= target
-    void Seek(const Slice &target) {
-        int left = 0, right = block->items.size() - 1;
+    void Seek(const Slice &target) override {
+        struct SlotComparator{
+            const char *buffer; // buffer指针
+            int operator()(const Slot& slot,const Slice& target){
+                uint32_t key_size =  DecodeFixed32(buffer+slot.offset);
+                Slice key(buffer+slot.offset+sizeof(uint32_t), key_size);
+                return key.compare(target);
+            }
+        };
+        SlotComparator comparator{};
+        comparator.buffer = block->buffer_;
+        int left = 0, right = block->GetSlotsNum()-1;
         while (left < right) {
-            int mid = left + right >> 1;
-            if (block->items[mid]->user_key.compare(target) > 0) {
+            int mid = (left + right)/2;
+            int ret = comparator(slots[mid],target);
+            if (ret>0) {
                 right = mid - 1;
-            } else if (block->items[mid]->user_key.compare(target) < 0) {
+            } else if (ret <0) {
                 left = mid + 1;
             } else {
                 id = mid;
                 return;
             }
         }
-        if (block->items[left]->user_key.compare(target) == 0) {
+        if (comparator(slots[left],target) == 0) {
             id = left;
             return;
         }
             //not found
         else {
-            id = block->items.size();
+            id = block->GetSlotsNum()-1;
             return;
         }
     }
 
-    void Next() {
+    void Next() override {
         id++;
     }
 
-    void Prev() {
+    void Prev() override {
         id--;
     }
 
-    Slice key() const {
-        return block->items[id]->user_key;
+    Slice key() const override {
+        return  getKeyFromSlot(slots[id]);
     }
 
-    Slice value() const {
-        return block->items[id]->user_value;
+    Slice value() const override {
+
+        return getValueFromSlot(slots[id]);
     }
 
 private:
+    Slice getKeyFromSlot(const Slot& slot) const {
+        uint32_t key_size =  DecodeFixed32(block->buffer_+slot.offset);
+        return Slice(block->buffer_+slot.offset+sizeof(uint32_t), key_size);
+    }
+    Slice getValueFromSlot(const Slot& slot)const {
+        uint32_t key_size =  DecodeFixed32(block->buffer_+slot.offset);
+        uint32_t val_size =DecodeFixed32(block->buffer_+slot.offset+
+                    sizeof(uint32_t)+key_size);
+        return Slice(block->buffer_+slot.offset+
+                    sizeof(uint32_t)+key_size+sizeof(uint32_t), val_size);
+    }
     Block *block;
+    const Slot * slots;
     int id;
 };
 

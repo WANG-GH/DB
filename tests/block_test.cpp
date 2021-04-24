@@ -15,26 +15,27 @@ TEST(BLOCK_TEST,TEST_1){
         memcpy(value,std::string("value"+std::to_string(i)).data(),std::string("value"+std::to_string(i)).size());
         Slice k(key,std::string("key"+std::to_string(i)).size());
         Slice v(value,std::string("value"+std::to_string(i)).size());
-        InternalKey *item = new InternalKey(i, kTypeValue,k,v);
-        builder.Add(item);
+        InternalKey internalKey(k,i,kTypeValue);
+
+        builder.Add(internalKey.Encode(),v);
     }
     Slice content = builder.Finish();
 
     Block block(content);
     Slice s("key6");
+    InternalKey internalKey(s,6,kTypeValue);
     BlockIterator* iter = new BlockIterator(&block);
-    iter->Seek(s);
+    iter->Seek(internalKey.Encode());
     if (iter->Valid()){
-        if (iter->key() == s){
             ASSERT_EQ(iter->value(),Slice("value6"));
-        }
     }
 
     for (int i = 0; i <10 ; i++) {
         Slice s("key"+std::to_string(i));
-        iter->Seek(s);
+        InternalKey internalKey(s,i ,kTypeValue);
+        iter->Seek(internalKey.Encode());
         if (iter->Valid()){
-            ASSERT_EQ(iter->value(),"value"+std::to_string(i));
+            ASSERT_EQ(iter->value(),Slice("value"+std::to_string(i)));
         }
 
     }

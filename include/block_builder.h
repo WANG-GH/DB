@@ -6,40 +6,45 @@
 #define KVENGINE_BLOCK_BUILDER_H
 
 #include "dbformat.h"
-//#include "key.h"
 #include "slice.h"
 #include <string>
+#include <vector>
+struct Slot{
+    uint64_t offset;
+    uint64_t length;
+    Slot(int64_t off,int64_t len){
+        offset = off;
+        length = len;
+    }
+};
+struct BlockTrailer{
+    uint64_t counter;
+};
+
 
 class  BlockBuilder  {
 public:
     BlockBuilder(){
         buffer_.clear();
-        counter_ = 0;
+        slots.clear();
     }
-    void Add(InternalKey* item){
-        counter_++;
-        item->EncodeTo(&buffer_);
-    }
-    Slice Finish(){
-        char  buf[4];
-        memcpy(buf,&counter_,4);
-        buffer_.append(buf,4);
-        return Slice(buffer_);
-    }
-    void Reset(){
-        counter_=0;
+    void Add(const Slice& key,const Slice& value);
+    Slice Finish();
+    inline void Reset(){
+        slots.clear();
         buffer_.clear();
     }
-    int CurrentSizeEstimate(){
+    inline int CurrentSizeEstimate(){
         return buffer_.size();
     }
-    bool IsEmpty(){
+    inline bool IsEmpty(){
         return buffer_.size()==0;
     }
 private:
     std::string buffer_;
-    int32_t counter_;
+    std::vector<Slot> slots;
 };
+
 
 
 #endif //KVENGINE_BLOCK_BUILDER_H

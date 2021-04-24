@@ -66,7 +66,7 @@ void PutFixed32(std::string* dst, uint32_t value);
 
 void PutFixed64(std::string* dst, uint64_t value);
 
-inline char *Copy(char *dst, const char *src, uint64_t len) {
+inline char *Copy(char *dst, const char *src, size_t len) {
     memcpy(dst,src,len);
     return dst+len;
 }
