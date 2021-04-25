@@ -19,10 +19,10 @@ public:
     Status Get(const Slice& key, std::string* value);
     Status Delete(const Slice& key);
 private:
-    Status Recover(VersionEdit* edit, bool* save_manifest);
+  //  Status Recover(VersionEdit* edit, bool* save_manifest);
     const Options options_;
     const std::string dbname_;
-    TableCache* table_cache_;
+  //  TableCache* table_cache_;
     MemTable* mem_;
     MemTable* imm_;
 };

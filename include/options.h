@@ -10,7 +10,7 @@ struct Options{
 
     // Amount of data to build up in memory (backed by an unsorted log
     // on disk) before converting to a sorted on-disk file.
-    size_t write_buffer_size = 4 * 1024 * 1024;
+    size_t write_buffer_size = 4 * 1024;  //测试时设为4k
 
     size_t block_size = 4 * 1024;
 
