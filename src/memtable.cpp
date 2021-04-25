@@ -73,9 +73,50 @@ MemTable::~MemTable() {
 }
 
 
+
 int MemTable::KeyComparator::operator()(const char *aptr, const char *bptr) const {
     // Internal keys are encoded as length-prefixed strings.
     Slice a = GetLengthPrefixedSlice(aptr);
     Slice b = GetLengthPrefixedSlice(bptr);
     return comparator.Compare(a, b);
 }
+//code internal key into memtablekey
+static const char* EncodeKey(std::string* scratch, const Slice& target) {
+    scratch->clear();
+    PutFixed32(scratch, target.size());
+    scratch->append(target.data(), target.size());
+    return scratch->data();
+}
+class MemTableIterator : public Iterator {
+public:
+    explicit MemTableIterator(MemTable::Table* table) : iter_(table) {}
+
+    MemTableIterator(const MemTableIterator&) = delete;
+    MemTableIterator& operator=(const MemTableIterator&) = delete;
+
+    ~MemTableIterator() override = default;
+
+    bool Valid() const override { return iter_.Valid(); }
+    //search internal key
+    void Seek(const Slice& k) override { iter_.Seek(EncodeKey(&tmp_, k)); }
+    void SeekToFirst() override { iter_.SeekToFirst(); }
+    void SeekToLast() override { iter_.SeekToLast(); }
+    void Next() override { iter_.Next(); }
+    void Prev() override { iter_.Prev(); }
+    Slice key() const override { return GetLengthPrefixedSlice(iter_.key()); }
+    Slice value() const override {
+        Slice key_slice = GetLengthPrefixedSlice(iter_.key());
+        return GetLengthPrefixedSlice(key_slice.data() + key_slice.size());
+    }
+    Status status() const  { return Status::OK(); }
+private:
+    MemTable::Table::Iterator iter_;
+    std::string tmp_;  // For passing to EncodeKey
+};
+
+Iterator *MemTable::NewIterator() {
+    return new MemTableIterator(&table_);
+}
+
+
+

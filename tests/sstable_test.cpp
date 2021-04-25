@@ -1,6 +1,7 @@
 //
 // Created by Linfp on 2021/4/20.
 //
+#include <memtable.h>
 #include "gtest/gtest.h"
 #include "table.h"
 #include "table_builder.h"
@@ -53,15 +54,27 @@ public:
     }
 };
 
-const int  MAX_BLOCK_SIZE = 4 * 1024;
-
+void BuildTable(const std::string& dbname, Env* env, const Options& options,Iterator* iter){
+    WritableFile* file;
+    env->NewWritableFile(dbname,&file);
+    TableBuilder* builder = new TableBuilder(options,file);
+    for (; iter->Valid() ; iter->Next()) {
+        //iter->key 得到的是internalkey  iter->value 得到的是user_value
+        builder->Add(iter->key(),iter->value());
+    }
+    builder->Finish();
+    delete builder;
+    file->Close();
+    delete file;
+    file = nullptr;
+    delete iter;
+}
 TEST(SSTABLE_TEST,TEST_1){
     Env* e = new PosixEnv();
     WritableFile* file;
     e->NewWritableFile("hello.db",&file);
     Options options;
     options.comparator = new BytewiseComparatorImpl();
-    options.block_size = MAX_BLOCK_SIZE;
     TableBuilder table_builder(options,file);
 
     for(int i=0;i<10;i++){
@@ -72,10 +85,8 @@ TEST(SSTABLE_TEST,TEST_1){
         Slice k(key,std::string("key"+std::to_string(i)).size());
         Slice v(value,std::string("value"+std::to_string(i)).size());
         InternalKey internalKey(k,i,kTypeValue);
-        char dst[internalKey.Encode().size()+sizeof(uint32_t)];
-        char *p = EncodeFixed32(dst,internalKey.Encode().size());
-        std::memcpy(p, internalKey.Encode().data(),internalKey.Encode().size());
-        table_builder.Add(Slice(dst,internalKey.Encode().size()+sizeof(uint32_t)),value);
+        //table 插入的是internalkey
+        table_builder.Add(Slice(internalKey.Encode().data() ,internalKey.Encode().size()),value);
     }
     table_builder.Finish();
     RandomAccessFile* rfile;
@@ -87,17 +98,60 @@ TEST(SSTABLE_TEST,TEST_1){
     Table* table ;
     Table::Open(options,rfile,statbuf.st_size,&table);
     Iterator* iter = table->NewIterator();
-
-
     for (int i = 0; i < 10; ++i) {
 
         InternalKey internalKey(std::string("key" + std::to_string(i)).data(),i,kTypeValue);
-        char dst[internalKey.Encode().size()+sizeof(uint32_t)];
-        char *p = EncodeFixed32(dst,internalKey.Encode().size());
-        std::memcpy(p, internalKey.Encode().data(),internalKey.Encode().size());
-        iter->Seek(Slice(dst,internalKey.Encode().size()+sizeof(uint32_t)));
+        iter->Seek(Slice(internalKey.Encode().data(),internalKey.Encode().size()));
         if (iter->Valid()){
             ASSERT_EQ(iter->value(),"value"+std::to_string(i));
+        }
+    }
+
+}
+
+TEST(SSTABLE_TEST, TEST_2) {
+    Comparator *usr_comparator = new BytewiseComparatorImpl();
+    const InternalKeyComparator internal_comparator(usr_comparator);
+    MemTable *memtable = new MemTable(internal_comparator);
+    MemTable *immutable;
+    Options options;
+    options.comparator = new BytewiseComparatorImpl();
+    for (int i = 0; i < 10000; ++i) {
+        char *key = new char[100];
+        char *value = new char[100];
+        memcpy(key, std::string("key" + std::to_string(i)).data(), std::string("key" + std::to_string(i)).size());
+        memcpy(value, std::string("value" + std::to_string(i)).data(), std::string("value" + std::to_string(i)).size());
+        Slice k(key, std::string("key" + std::to_string(i)).size());
+        Slice v(value, std::string("value" + std::to_string(i)).size());
+        memtable->Add(i, kTypeValue, k, v);
+        immutable = memtable;
+        memtable = new MemTable(internal_comparator);
+        Iterator* iter = memtable->NewIterator();
+        Env* e = new PosixEnv();
+        //实际需要另外起一个线程将immutable刷盘
+        std::string dbname = "hello.db1";
+        if (memtable->ApproximateMemoryUsage()>options.write_buffer_size){
+            BuildTable(dbname,e,options,iter);
+            //打开sstable
+            RandomAccessFile* rfile;
+            uint64_t file_size;
+            //TODO：env需要一个GetFileSize
+            struct stat statbuf;
+            stat(dbname.data(),&statbuf);
+            e->NewRandomAccessFile(dbname,&rfile);
+            Table* table ;
+            Table::Open(options,rfile,statbuf.st_size,&table);
+            ASSERT_NE(table, nullptr);
+            iter = table->NewIterator();
+            int i=0;
+            for (; i < 10; ++i) {
+                InternalKey internalKey(std::string("key" + std::to_string(i)).data(),i,kTypeValue);
+                iter->Seek(Slice(internalKey.Encode().data(),internalKey.Encode().size()));
+                if (iter->Valid()){
+                    ASSERT_EQ(iter->value(),"value"+std::to_string(i));
+                }
+            }
+            ASSERT_EQ(i,10); //确保db打开且经过读取测试
         }
     }
 

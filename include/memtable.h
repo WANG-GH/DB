@@ -11,7 +11,10 @@
 #include "comparator.h"
 #include "status.h"
 #include "dbformat.h"
+#include "iterator.h"
 
+
+class MemTableIterator;
 
 class MemTable {
 public:
@@ -19,11 +22,11 @@ public:
             : comparator_(comparator), table_(comparator_, &arena_) {}
     MemTable(const MemTable&) = delete;
     MemTable& operator=(const MemTable&) = delete;
-
+    Iterator* NewIterator();
     // Returns an estimate of the number of bytes of data in use by this
     // data structure. It is safe to call when MemTable is being modified.
     inline     uint64_t ApproximateMemoryUsage(){
-        return memoryUsage_;
+        return arena_.MemoryUsage();
     }
 
     // Return an iterator that yields the contents of the memtable.
@@ -46,6 +49,7 @@ public:
     bool Get(const LookupKey & lookupKey, std::string* value, Status* s);
     ~MemTable();  // Private since only Unref() should be used to delete it
 private:
+    friend class MemTableIterator;
     struct KeyComparator {
         const InternalKeyComparator comparator;
         explicit KeyComparator(InternalKeyComparator  c) : comparator(std::move(c)) {}
@@ -55,7 +59,6 @@ private:
 
     KeyComparator comparator_;
     Table table_;
-    uint64_t memoryUsage_;
     Arena arena_;
 };
 

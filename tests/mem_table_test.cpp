@@ -53,7 +53,7 @@ public:
     }
 };
 
-TEST(MEMTABLE_TEST, TEST_1) {
+TEST(MEMTABLE_TEST, TEST_ADD_GET) {
     Comparator *usr_comparator = new BytewiseComparatorImpl();
     const InternalKeyComparator internal_comparator_(usr_comparator);
     MemTable *memtable = new MemTable(internal_comparator_);
@@ -84,3 +84,45 @@ TEST(MEMTABLE_TEST, TEST_1) {
         ASSERT_EQ(value, "value" + std::to_string(i));
     }
 }
+TEST(MEMTABLE_TEST, TEST_MEM_ITERATOR) {
+    Comparator *usr_comparator = new BytewiseComparatorImpl();
+    const InternalKeyComparator internal_comparator_(usr_comparator);
+    MemTable *memtable = new MemTable(internal_comparator_);
+
+    for (int i = 0; i < 100; ++i) {
+        char *key = new char[100];
+        char *value = new char[100];
+        memcpy(key, std::string("key" + std::to_string(i)).data(), std::string("key" + std::to_string(i)).size());
+        memcpy(value, std::string("value" + std::to_string(i)).data(), std::string("value" + std::to_string(i)).size());
+        Slice k(key, std::string("key" + std::to_string(i)).size());
+        Slice v(value, std::string("value" + std::to_string(i)).size());
+        memtable->Add(i, kTypeValue, k, v);
+    }
+    for (int i = 200; i >= 100; i--) {
+        char *key = new char[100];
+        char *value = new char[100];
+        memcpy(key, std::string("key" + std::to_string(i)).data(), std::string("key" + std::to_string(i)).size());
+        memcpy(value, std::string("value" + std::to_string(i)).data(), std::string("value" + std::to_string(i)).size());
+        Slice k(key, std::string("key" + std::to_string(i)).size());
+        Slice v(value, std::string("value" + std::to_string(i)).size());
+        memtable->Add(i, kTypeValue, k, v);
+    }
+
+    int looks[10]={12,41,5,6,7,8,3,5,21,99};
+    Iterator* iter = memtable->NewIterator();
+    iter->SeekToFirst();
+    for (int i = 0; i < 10; ++i) {
+        char *key = new char[100];
+        char *value = new char[100];
+        memcpy(key, std::string("key" + std::to_string(looks[i])).data(), std::string("key" + std::to_string(looks[i])).size());
+        memcpy(value, std::string("value" + std::to_string(looks[i])).data(), std::string("value" + std::to_string(looks[i])).size());
+        Slice v(value, std::string("value" + std::to_string(looks[i])).size());
+        Slice k(key, std::string("key" + std::to_string(looks[i])).size());
+        InternalKey internalKey(k,looks[i],kTypeValue);
+        iter->Seek(internalKey.Encode());
+        ASSERT_EQ(iter->value(),v);
+    }
+}
+
+
+
